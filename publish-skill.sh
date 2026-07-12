@@ -28,7 +28,20 @@ if git diff --cached --quiet; then
   exit 0
 fi
 git commit -m "Add/update plugin: $PLUGIN" >/dev/null
-git push
+
+# Push. On the host (Claude Code) gh's credential helper handles auth. Inside
+# Cowork's sandbox VM, supply a GitHub token via GITHUB_TOKEN/GH_TOKEN env or a
+# gitignored .github-token file in this repo (the token is never committed).
+TOKEN="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
+if [ -z "$TOKEN" ] && [ -f "$REPO_ROOT/.github-token" ]; then
+  TOKEN="$(tr -d '[:space:]' < "$REPO_ROOT/.github-token")"
+fi
+if [ -n "$TOKEN" ]; then
+  SLUG="$(git remote get-url origin | sed -E 's#.*github\.com[:/]##; s#\.git$##')"
+  git push "https://x-access-token:${TOKEN}@github.com/${SLUG}.git" HEAD:main
+else
+  git push
+fi
 MARKET="$(python3 -c "import json;print(json.load(open('$REPO_ROOT/.claude-plugin/marketplace.json'))['name'])")"
 echo "✅ Pushed '$PLUGIN'."
 echo "   In Cowork/Desktop:  /plugin marketplace update $MARKET   then   /plugin install $PLUGIN@$MARKET"
