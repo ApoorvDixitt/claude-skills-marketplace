@@ -27,7 +27,12 @@ if git diff --cached --quiet; then
   echo "Nothing changed for $PLUGIN (already up to date)."
   exit 0
 fi
-git commit -m "Add/update plugin: $PLUGIN" >/dev/null
+# Use existing git identity if set, else a fallback (Cowork's VM has none configured).
+CE="$(git config user.email 2>/dev/null || true)"
+CN="$(git config user.name 2>/dev/null || true)"
+git -c user.email="${CE:-skill-publisher@users.noreply.github.com}" \
+    -c user.name="${CN:-skill-publisher}" \
+    commit -m "Add/update plugin: $PLUGIN" >/dev/null
 
 # Push. On the host (Claude Code) gh's credential helper handles auth. Inside
 # Cowork's sandbox VM, supply a GitHub token via GITHUB_TOKEN/GH_TOKEN env or a
