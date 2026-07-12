@@ -68,8 +68,11 @@ def main() -> int:
 
     shutil.copytree(src, dest / "skills" / name, ignore=_ignore)
 
+    # No "version" field on purpose: for a git-hosted marketplace, Claude treats
+    # each commit as a new version, so every re-publish of an edited skill is
+    # auto-detected as an update. Pinning a static version would suppress updates.
     (dest / ".claude-plugin" / "plugin.json").write_text(
-        json.dumps({"name": plugin, "description": desc, "version": "1.0.0"}, indent=2) + "\n"
+        json.dumps({"name": plugin, "description": desc}, indent=2) + "\n"
     )
 
     mp = repo / ".claude-plugin" / "marketplace.json"
