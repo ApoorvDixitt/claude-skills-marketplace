@@ -39,7 +39,8 @@ git -c user.email="${CE:-skill-publisher@users.noreply.github.com}" \
 # gitignored .github-token file in this repo (the token is never committed).
 TOKEN="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
 if [ -z "$TOKEN" ] && [ -f "$REPO_ROOT/.github-token" ]; then
-  TOKEN="$(tr -d '[:space:]' < "$REPO_ROOT/.github-token")"
+  # ignore comment lines (#...) and whitespace; whatever remains is the token
+  TOKEN="$(grep -vE '^[[:space:]]*#' "$REPO_ROOT/.github-token" | tr -d '[:space:]')"
 fi
 if [ -n "$TOKEN" ]; then
   SLUG="$(git remote get-url origin | sed -E 's#.*github\.com[:/]##; s#\.git$##')"
