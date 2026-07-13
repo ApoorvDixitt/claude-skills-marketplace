@@ -14,6 +14,7 @@ Copy-paste starting points for the community-health files. Adapt names, years, a
 - [Pull request template](#pull-request-template)
 - [dependabot.yml](#dependabotyml)
 - [ci.yml (starter)](#ciyml-starter)
+- [release.yml (publish on tag)](#releaseyml-publish-on-tag)
 - [FUNDING.yml](#fundingyml)
 
 ---
@@ -266,6 +267,65 @@ jobs:
 ```
 
 Swap the language setup steps for the project's stack. Keep installs deterministic (`npm ci`, `poetry install`, etc.) and commit the lockfile.
+
+---
+
+## release.yml (publish on tag)
+
+Add this **only when a project ships an installable artifact** and manual publishing has become
+repetitive — it's the step-2 automation from `releasing-and-publishing.md`. Keep it a **separate
+workflow from `ci.yml`**: publishing needs elevated permissions and should be narrowly scoped.
+
+The example below uses **PyPI trusted publishing (OIDC)** — the canonical pattern. It shows the
+two ideas that generalize to any registry: **build and publish are separate jobs**, and only the
+tiny publish job gets `id-token: write` (job-scoped), gated by a `release` environment. No API
+token is stored anywhere. First configure the trusted publisher on the registry, scoped to this
+`owner/repo` + workflow filename + environment.
+
+```yaml
+name: Release
+on:
+  push:
+    tags: ["v*"]          # publish only when a version tag is pushed
+permissions: {}           # default to nothing; grant per-job below
+
+jobs:
+  build:                  # build with least privilege — no publish rights
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.12"
+      - run: python -m pip install build && python -m build
+      - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with: { name: dist, path: dist/ }
+
+  publish:                # the only job with publish rights
+    needs: build
+    runs-on: ubuntu-latest
+    environment: release  # gate: add required reviewers on this environment in repo settings
+    permissions:
+      id-token: write      # mint the short-lived OIDC token — this line is what enables OIDC
+    steps:
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with: { name: dist, path: dist/ }
+      - uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdf1 # v1.12.4
+        # no username/password: the action uses the OIDC token automatically
+```
+
+Adapting to other registries — the skeleton (tag trigger → build job → OIDC publish job, env-gated)
+stays identical; swap the publish step:
+
+- **npm** (OIDC, provenance automatic): in the publish job, `setup-node` with
+  `registry-url: https://registry.npmjs.org`, then `npm ci && npm publish`. Keep `id-token: write`.
+  Requires npm CLI ≥ 11.5.1; use `--access public` for a scoped package's first publish.
+- **crates.io / RubyGems**: swap in their OIDC publish action / `cargo publish` / `gem push`.
+- **Compiled CLI/app**: replace the build job with **GoReleaser** (`goreleaser/goreleaser-action`,
+  `fetch-depth: 0`) or **cargo-dist**, which build the OS/arch matrix and upload binaries +
+  checksums to the GitHub Release themselves.
+- **No OIDC available** (self-hosted runner / unsupported registry): drop `id-token: write`, add
+  the registry token as a repo/environment secret, and pass it to the publish step instead.
 
 ---
 

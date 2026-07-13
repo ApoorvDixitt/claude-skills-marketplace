@@ -95,6 +95,8 @@ git push origin v1.2.3
 ```
 Create a GitHub Release per tag with notes/assets; GitHub can auto-generate notes from merged PRs/labels. Ship early and often: patch releases as needed, features batched into minors, `-rc.x` pre-releases before a major.
 
+A tag + GitHub Release is the whole story for a project nobody *installs* (an app, a website, a template). If the project is a library, CLI, or image that people install from a registry, the release also has a **publish** half — the end-to-end process, per-registry cheat-sheet, trusted publishing (OIDC), and CI publish workflows live in `references/releasing-and-publishing.md`.
+
 ---
 
 ## Release automation

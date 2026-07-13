@@ -77,13 +77,14 @@ Advise (and propose the commands for the user to run) on a clean git history fro
 
 For the full commit-type reference, branching-strategy deep dive, PR/merge guidance, SemVer rules, and release automation options, read `references/git-workflow.md` when you reach this phase.
 
-### 6. CI, releases, and docs (right-sized)
+### 6. CI, releases, and publishing (right-sized)
 
 - **CI (GitHub Actions):** a single `ci.yml` running lint + test + build on every PR is plenty to start. **Pin actions to full commit SHAs, not tags** (mutable tags are a real supply-chain risk). Add Dependabot and CodeQL as value grows.
-- **Versioning & releases:** follow **SemVer** (`MAJOR.MINOR.PATCH`); `0.y.z` while the API is unstable, `1.0.0` when you commit to it. Tag releases (`vX.Y.Z`) and cut a GitHub Release. Add automated changelog/release tooling (release-please or changesets) only when manual upkeep starts to hurt.
+- **Versioning & releases:** follow **SemVer** (`MAJOR.MINOR.PATCH`); `0.y.z` while the API is unstable, `1.0.0` when you commit to it. *Every* project can cut a release with no registry involved: tag `vX.Y.Z` and create a GitHub Release (let GitHub auto-generate notes from merged PRs). Add automated changelog/release tooling (release-please or changesets) only when manual upkeep starts to hurt.
+- **Publishing a package (only if it's installed or depended on):** a library, CLI, or container image also needs to reach a registry — npm, PyPI, crates.io, GHCR, and so on — so people can `install <name>` instead of cloning. The release *process* is the same across stacks; only the manifest and the publish command differ. Start with a single manual publish command, and graduate to a tag-triggered workflow once you're doing it often. Where the registry supports it (npm, PyPI, crates.io, RubyGems), prefer **trusted publishing (OIDC)** over a stored API token — it's the current default, needs no secrets, and gives you provenance for free. An app or website *deploys* rather than publishes, so this bullet doesn't apply to it.
 - **Docs:** README-only is correct for most small projects. Escalate to a `docs/` folder, then a docs site (MkDocs/Docusaurus/VitePress) only when you need search/versioning. An `examples/` folder lowers onboarding friction cheaply.
 
-`references/git-workflow.md` covers releases and CI in more depth.
+When the project ships an installable artifact — or you simply reach the release/publish step and want the concrete process, the per-registry cheat-sheet, artifact/binary-building tools, or a CI publish workflow — read `references/releasing-and-publishing.md`. `references/git-workflow.md` covers SemVer, tags, and release automation in more depth.
 
 ### 7. Hand off with a checklist
 
@@ -104,4 +105,5 @@ Read these as needed — don't load them all up front:
 
 - `references/templates.md` — copy-paste templates: README structure, LICENSE pointer, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CHANGELOG, `.gitignore`/`.editorconfig`, issue/PR templates, `dependabot.yml`, a starter `ci.yml`.
 - `references/git-workflow.md` — Conventional Commits full type list, branching strategies by size, PR/merge methods, SemVer, tags/releases, release automation, signed commits.
+- `references/releasing-and-publishing.md` — the end-to-end release process, a registry cheat-sheet (npm/PyPI/crates/Docker/Go/…), trusted publishing (OIDC), building release binaries (GoReleaser/cargo-dist), CI publish workflows, and provenance/signing. Read when the project ships an installable artifact or you reach the release/publish step.
 - `references/checklist.md` — the master setup checklist to tailor and hand to the user.

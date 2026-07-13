@@ -43,12 +43,22 @@ Tailor this to the project and its size tier, then hand it to the user as an ord
 - [ ] `.github/dependabot.yml` for deps + github-actions
 - [ ] (Grows to medium+) CodeQL / code scanning; release automation (release-please/changesets)
 
-## Phase 6 — Docs & launch
+## Phase 6 — Docs, release & launch
 - [ ] Quickstart verified by following it from scratch
 - [ ] `examples/` folder with a runnable sample (if it helps)
-- [ ] First tagged release `v0.1.0` + GitHub Release notes
+- [ ] Version set in the manifest (package.json/pyproject.toml/Cargo.toml/…) and matching the tag
+- [ ] First tagged release `v0.1.0` + GitHub Release notes (auto-generated from merged PRs)
 - [ ] Repo description, topics/tags, and website link set on GitHub
 - [ ] (Grows) docs site (MkDocs/Docusaurus/VitePress) when search/versioning needed
+
+## Phase 7 — Publish a package (only if it's installed or depended on; an app/website deploys instead — skip this)
+- [ ] Package name confirmed available on the target registry (ideally settled back in Phase 0)
+- [ ] Manifest metadata complete: description, SPDX license, repository URL, keywords, author
+- [ ] Dry-run inspected — only intended files ship, no secrets or junk (`npm publish --dry-run`, `twine check`, etc.)
+- [ ] First publish done and verified by installing the published version in a clean environment
+- [ ] (Compiled CLI/app) prebuilt binaries + `SHA256SUMS` attached to the Release (GoReleaser / cargo-dist / build matrix)
+- [ ] (When it gets repetitive) tag-triggered `release.yml` using trusted publishing (OIDC); publish job separate from `ci.yml`, permissions job-scoped, gated by a `release` environment
+- [ ] (Grows) release-PR automation (release-please for polyglot/monorepo, changesets for JS/TS monorepo, semantic-release for a single package)
 
 ## Ongoing
 - [ ] Keep README/CHANGELOG current with each release
