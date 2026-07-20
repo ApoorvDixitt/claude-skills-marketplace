@@ -18,6 +18,11 @@
       "name": "x-writing-plugin",
       "source": "./plugins/x-writing-plugin",
       "description": "|"
+    },
+    {
+      "name": "x-articles-plugin",
+      "source": "./plugins/x-articles-plugin",
+      "description": "|"
     }
   ]
 }
