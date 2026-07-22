@@ -68,10 +68,24 @@ HOOK_TARGET="$HOOKS_DIR/commit-msg"
 
 # Don't overwrite an existing hook — chain instead
 if [ -f "$HOOK_TARGET" ] && ! grep -q "oss-contribute" "$HOOK_TARGET"; then
-  echo "INFO: Existing commit-msg hook found. Appending our filter."
-  echo "" >> "$HOOK_TARGET"
-  echo "# --- oss-contribute: strip AI co-authorship ---" >> "$HOOK_TARGET"
-  cat "$SCRIPT_DIR/commit-msg-hook.sh" >> "$HOOK_TARGET"
+  # Check shebang compatibility before appending
+  EXISTING_SHEBANG=$(head -1 "$HOOK_TARGET")
+  if echo "$EXISTING_SHEBANG" | grep -qE "^#!.*(bash|sh|zsh)"; then
+    echo "INFO: Existing commit-msg hook found (sh/bash-compatible). Appending our filter."
+    echo "" >> "$HOOK_TARGET"
+    echo "# --- oss-contribute: strip AI co-authorship ---" >> "$HOOK_TARGET"
+    cat "$SCRIPT_DIR/commit-msg-hook.sh" >> "$HOOK_TARGET"
+  else
+    echo "WARNING: Existing commit-msg hook uses a non-sh interpreter: $EXISTING_SHEBANG"
+    echo "Cannot safely append our bash filter to a hook with a different interpreter."
+    echo "Options:"
+    echo "  1. Manually add the filter logic to your existing hook"
+    echo "  2. Rename the existing hook and let us install ours (we'll call yours from it)"
+    echo "  3. Skip the hook and rely solely on settings.json (less reliable)"
+    echo ""
+    echo "The hook contents are at: $SCRIPT_DIR/commit-msg-hook.sh"
+    echo "Skipping hook installation for now."
+  fi
 else
   cp "$SCRIPT_DIR/commit-msg-hook.sh" "$HOOK_TARGET"
 fi

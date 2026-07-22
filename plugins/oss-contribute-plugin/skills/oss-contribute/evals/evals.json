@@ -6,14 +6,99 @@
       "name": "contribute-full-flow",
       "prompt": "I want to contribute to langchain-ai/langchain — help me find a good first issue and understand the codebase before I start.",
       "expected_output": "Should: (1) search for good-first-issue/help-wanted in that repo, (2) run the AI policy pre-flight check, (3) produce a codebase recon report following the template, (4) score 3-5 issues with the difficulty rubric. Should NOT skip the pre-flight check or jump straight to implementation.",
-      "files": []
+      "files": [],
+      "assertions": [
+        {
+          "name": "searches_entry_point_issues",
+          "type": "contains",
+          "description": "Searches for good-first-issue or help-wanted labeled issues in the repo",
+          "check": "Searches for issues with entry-point labels and presents candidates"
+        },
+        {
+          "name": "runs_ai_policy_preflight",
+          "type": "contains",
+          "description": "Runs or references the AI policy pre-flight check before any implementation",
+          "check": "Pre-flight check executed or referenced with a verdict (CLEAR/DISCLOSE/CAUTION/STOP)"
+        },
+        {
+          "name": "produces_recon_report",
+          "type": "contains",
+          "description": "Produces a codebase recon report with architecture, conventions, and build commands",
+          "check": "Structured recon covering architecture, build/test commands, and coding conventions"
+        },
+        {
+          "name": "scores_issues_with_rubric",
+          "type": "contains",
+          "description": "Scores at least 2 issues using the 6-dimension difficulty rubric",
+          "check": "At least 2 issues scored with the Scope/Complexity/Test/Breaking/Domain/Familiarity dimensions"
+        }
+      ]
     },
     {
       "id": 1,
+      "name": "implement-and-pr",
+      "prompt": "I've picked issue #31802 in langchain-ai/langchain (EvaluationResult.feedback_config silently drops dict data). Help me implement a fix and open a PR. The issue is a Pydantic model that drops unknown fields — the fix should make feedback_config accept arbitrary dict data.",
+      "expected_output": "Should: (1) run setup-repo.sh or address the co-authorship rule before first commit, (2) implement a fix matching project conventions, (3) write tests, (4) produce a plain-language summary and WAIT for confirmation before running gh pr create. Should NOT skip the pre-PR summary gate or auto-open the PR without asking.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "addresses_coauthorship_rule",
+          "type": "contains",
+          "description": "Runs setup-repo.sh or explicitly addresses Rule 1 (no AI co-authorship) before committing",
+          "check": "References setup-repo.sh, commit-msg hook, or disabling AI attribution before first commit"
+        },
+        {
+          "name": "matches_project_conventions",
+          "type": "contains",
+          "description": "Implementation follows project conventions (commit format, code style, test patterns)",
+          "check": "Uses conventional commit format and matches the project's coding patterns"
+        },
+        {
+          "name": "writes_tests",
+          "type": "contains",
+          "description": "Writes or proposes tests for the fix",
+          "check": "Includes test code or describes what tests to write for the fix"
+        },
+        {
+          "name": "plain_language_summary_gate",
+          "type": "contains",
+          "description": "Produces a plain-language summary and waits for confirmation before gh pr create",
+          "check": "Presents a summary explaining what/why/how before opening PR, asks for user confirmation"
+        }
+      ]
+    },
+    {
+      "id": 2,
       "name": "post-merge-leverage",
       "prompt": "My PR just got merged into vercel/next.js — I fixed a race condition in the App Router's prefetch cache that was causing stale data on client-side navigations. PR #67890. Help me write this up for my resume and draft an X post about it.",
       "expected_output": "Should produce: (1) a resume bullet using the verb+what+project(scale)+impact formula, (2) an X/Twitter thread draft using the 5-tweet formula, (3) note that LinkedIn/X drafts should be handed off to x-writing/humanizer skills for voice. Should reference the actual PR number and project details.",
-      "files": []
+      "files": [],
+      "assertions": [
+        {
+          "name": "resume_bullet_formula",
+          "type": "contains",
+          "description": "Produces a resume bullet using action-verb + what + project(scale) + impact formula",
+          "check": "Resume bullet with verb, specific contribution, Next.js + star count, and impact"
+        },
+        {
+          "name": "x_thread_format",
+          "type": "contains",
+          "description": "Produces an X/Twitter thread draft in multi-tweet format",
+          "check": "Multi-tweet thread with hook, problem, approach, learning, and link tweets"
+        },
+        {
+          "name": "references_pr_details",
+          "type": "contains",
+          "description": "References the actual PR number and project details",
+          "check": "Mentions PR #67890, race condition, prefetch cache, Next.js"
+        },
+        {
+          "name": "skill_handoff_mention",
+          "type": "contains",
+          "description": "Mentions handoff to x-writing or humanizer skills for final voice/tone",
+          "check": "References x-writing and/or humanizer skills for tone polishing"
+        }
+      ]
     }
   ]
 }

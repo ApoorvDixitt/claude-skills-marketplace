@@ -26,7 +26,7 @@ CONTRIBUTING=$(curl -sf "https://raw.githubusercontent.com/$REPO/$DEFAULT_BRANCH
                curl -sf "https://raw.githubusercontent.com/$REPO/$DEFAULT_BRANCH/docs/CONTRIBUTING.md" || echo "")
 
 if [ -n "$CONTRIBUTING" ]; then
-  AI_MENTIONS=$(echo "$CONTRIBUTING" | grep -i -c "ai\|artificial intelligence\|llm\|chatgpt\|copilot\|generated\|machine learning\|assisted-by\|claude\|gpt" || echo "0")
+  AI_MENTIONS=$(echo "$CONTRIBUTING" | grep -i -c "ai\|artificial intelligence\|llm\|chatgpt\|copilot\|generated\|machine learning\|assisted-by\|claude\|gpt" || true)
   if [ "$AI_MENTIONS" -gt 0 ]; then
     echo "WARNING: CONTRIBUTING.md mentions AI/LLM ($AI_MENTIONS references)"
     MATCHES=$(echo "$CONTRIBUTING" | grep -i "ai\|artificial intelligence\|llm\|chatgpt\|copilot\|generated\|assisted-by\|claude\|gpt" | head -5)
@@ -129,7 +129,7 @@ PR_TEMPLATE=$(curl -sf "https://raw.githubusercontent.com/$REPO/$DEFAULT_BRANCH/
               curl -sf "https://raw.githubusercontent.com/$REPO/$DEFAULT_BRANCH/PULL_REQUEST_TEMPLATE.md" || echo "")
 
 if [ -n "$PR_TEMPLATE" ]; then
-  AI_IN_PR=$(echo "$PR_TEMPLATE" | grep -i -c "ai\|generated\|assisted\|copilot\|llm" || echo "0")
+  AI_IN_PR=$(echo "$PR_TEMPLATE" | grep -i -c "ai\|generated\|assisted\|copilot\|llm" || true)
   if [ "$AI_IN_PR" -gt 0 ]; then
     echo "WARNING: PR template mentions AI/generated content"
     echo "$PR_TEMPLATE" | grep -i "ai\|generated\|assisted\|copilot\|llm"

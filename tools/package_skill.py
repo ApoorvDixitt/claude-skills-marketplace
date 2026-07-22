@@ -16,6 +16,11 @@ import shutil
 import sys
 from pathlib import Path
 
+try:
+    import yaml
+except ImportError:
+    yaml = None  # type: ignore[assignment]
+
 
 def main() -> int:
     if len(sys.argv) != 3:
@@ -49,10 +54,17 @@ def main() -> int:
     fm = {}
     m = re.match(r"^---\s*\n(.*?)\n---", text, re.S)
     if m:
-        for line in m.group(1).splitlines():
-            if ":" in line:
-                k, v = line.split(":", 1)
-                fm[k.strip()] = v.strip()
+        raw_fm = m.group(1)
+        if yaml is not None:
+            parsed = yaml.safe_load(raw_fm)
+            if isinstance(parsed, dict):
+                fm = {str(k): str(v) for k, v in parsed.items() if v is not None}
+        else:
+            # Fallback: manual parsing (handles simple key: value but NOT block scalars)
+            for line in raw_fm.splitlines():
+                if ":" in line and not line.startswith(" "):
+                    k, v = line.split(":", 1)
+                    fm[k.strip()] = v.strip()
 
     name = (fm.get("name") or src.name).strip().replace(" ", "-")
     desc = fm.get("description") or f"Skill: {name}"

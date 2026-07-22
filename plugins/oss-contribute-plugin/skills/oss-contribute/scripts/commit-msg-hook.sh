@@ -35,6 +35,9 @@ grep -v -i \
   -e "Co-authored-by:.*[Cc]ursor" \
   -e "Co-authored-by:.*[Oo]penAI" \
   -e "Co-authored-by:.*[Gg]ithub.*[Cc]opilot" \
+  -e "Generated with \[*Claude Code\]*" \
+  -e "Generated with Claude" \
+  -e "🤖 Generated with" \
   "$COMMIT_MSG_FILE" > "$TEMP" 2>/dev/null || true
 
 # Remove trailing blank lines that might be left after stripping

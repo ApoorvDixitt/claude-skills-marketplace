@@ -27,12 +27,12 @@
     {
       "name": "oss-scout-plugin",
       "source": "./plugins/oss-scout-plugin",
-      "description": ">"
+      "description": "Find high-impact open source repositories worth contributing to — ranked by how much a merged PR would boost your resume, GitHub profile visibility, and recruiter reach. Use this skill whenever the user asks to discover repos for open source contribution, wants to find \"something good to contribute to,\" asks what OSS projects would look impressive on a resume, wants trending or high-impact repos in a particular stack, or says anything about finding open source projects to work on — even if they don't use the word \"scout.\" This is the repo-level discovery skill; it does NOT handle issue triage or implementation within a chosen repo."
     },
     {
       "name": "oss-contribute-plugin",
       "source": "./plugins/oss-contribute-plugin",
-      "description": ">"
+      "description": "End-to-end open source contribution workflow — from choosing an issue within a repo through merge and career leverage. Use this skill whenever the user wants to contribute to a specific open source project, find issues to work on within a chosen repo, do codebase recon before contributing, write a PR description, respond to reviewer feedback, format a merged PR for their resume/LinkedIn/X, or asks anything about the mechanics of making an open source contribution. Trigger on phrases like \"help me contribute to [repo]\", \"find me a good first issue\", \"recon this codebase\", \"write a PR for this\", \"help me respond to this review\", or \"write up this contribution for my resume.\" This skill assumes the repo is already chosen — if the user hasn't picked one yet, suggest oss-scout first."
     }
   ]
 }

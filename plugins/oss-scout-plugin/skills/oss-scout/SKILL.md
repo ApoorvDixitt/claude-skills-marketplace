@@ -69,11 +69,34 @@ tool you need.
 Aim for 15-25 candidates before scoring. More is fine, fewer is acceptable if
 filters are narrow.
 
-### Step 3: Score Each Candidate
+### Step 3: Score Candidates (Two-Pass)
 
-Run `scripts/score-repo.sh` for every candidate repo. This script computes the
-three-factor score. Read `references/scoring-rubric.md` for the full rubric
-with metric tables and thresholds.
+Scoring uses two passes to balance speed with accuracy.
+
+**Pass 1 — Fast filter (all candidates):**
+Run `scripts/score-repo.sh` for every candidate repo. This uses cheap API calls
+(repo metadata, star count, push date, GFI count, contributor stats) to produce
+an approximate score. It intentionally approximates PR review turnaround, merge
+rate, star velocity, and foundational-infra status from proxies rather than making
+expensive GraphQL/Libraries.io queries for 20+ repos.
+
+**Pass 2 — Deep scoring (top 5-10 only):**
+Take the top 5-10 repos from Pass 1 and run the real queries documented in
+`references/scoring-rubric.md` and `references/discovery-api-cookbook.md`:
+
+1. **PR review turnaround** — GraphQL query on last 10 merged PRs (time from
+   open to first review). See scoring-rubric.md "How to Compute" under
+   Contributability.
+2. **PR merge rate** — GraphQL: merged vs closed PRs ratio.
+3. **Star velocity** — Binary search on stargazers endpoint (cookbook Section 5,
+   Approach A) or OSS Insight API (Approach B). ~13 API calls per repo.
+4. **Foundational-infra dependents count** — Libraries.io API:
+   `curl "https://libraries.io/api/github/OWNER/REPO?api_key=$KEY"` →
+   `.dependents_count`
+
+These four queries replace the proxies from Pass 1 with real data before the
+final ranking. If rate limits or missing API keys prevent a query, keep the
+Pass 1 approximation and note it in the report.
 
 **The formula:**
 
@@ -81,11 +104,9 @@ with metric tables and thresholds.
 Total Score = Recognizability (35%) + Contributability (35%) + Role/Ecosystem Relevance (30%)
 ```
 
-Each factor is 0-100, weighted to produce a 0-100 composite.
-
-If the script can't be executed (e.g., no shell access, rate limits), compute the
-score manually using the rubric tables in `references/scoring-rubric.md`. The
-rubric has explicit thresholds for each metric so you can score without the script.
+Each factor is 0-100, weighted to produce a 0-100 composite. Read
+`references/scoring-rubric.md` for the full rubric with metric tables and
+thresholds.
 
 ### Step 4: AI Policy Flag
 

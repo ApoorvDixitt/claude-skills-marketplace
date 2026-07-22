@@ -1,4 +1,4 @@
 {
   "name": "oss-scout-plugin",
-  "description": ">"
+  "description": "Find high-impact open source repositories worth contributing to — ranked by how much a merged PR would boost your resume, GitHub profile visibility, and recruiter reach. Use this skill whenever the user asks to discover repos for open source contribution, wants to find \"something good to contribute to,\" asks what OSS projects would look impressive on a resume, wants trending or high-impact repos in a particular stack, or says anything about finding open source projects to work on — even if they don't use the word \"scout.\" Also trigger when they ask vague questions like \"what should I contribute to this week\" or \"find me something in AI/agents/backend/fullstack.\" This is the repo-level discovery skill; it does NOT handle issue triage or implementation within a chosen repo."
 }
