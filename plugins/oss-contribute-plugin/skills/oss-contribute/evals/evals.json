@@ -1,0 +1,19 @@
+{
+  "skill_name": "oss-contribute",
+  "evals": [
+    {
+      "id": 0,
+      "name": "contribute-full-flow",
+      "prompt": "I want to contribute to langchain-ai/langchain — help me find a good first issue and understand the codebase before I start.",
+      "expected_output": "Should: (1) search for good-first-issue/help-wanted in that repo, (2) run the AI policy pre-flight check, (3) produce a codebase recon report following the template, (4) score 3-5 issues with the difficulty rubric. Should NOT skip the pre-flight check or jump straight to implementation.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "post-merge-leverage",
+      "prompt": "My PR just got merged into vercel/next.js — I fixed a race condition in the App Router's prefetch cache that was causing stale data on client-side navigations. PR #67890. Help me write this up for my resume and draft an X post about it.",
+      "expected_output": "Should produce: (1) a resume bullet using the verb+what+project(scale)+impact formula, (2) an X/Twitter thread draft using the 5-tweet formula, (3) note that LinkedIn/X drafts should be handed off to x-writing/humanizer skills for voice. Should reference the actual PR number and project details.",
+      "files": []
+    }
+  ]
+}

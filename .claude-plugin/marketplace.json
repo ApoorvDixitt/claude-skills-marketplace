@@ -28,6 +28,11 @@
       "name": "oss-scout-plugin",
       "source": "./plugins/oss-scout-plugin",
       "description": ">"
+    },
+    {
+      "name": "oss-contribute-plugin",
+      "source": "./plugins/oss-contribute-plugin",
+      "description": ">"
     }
   ]
 }
