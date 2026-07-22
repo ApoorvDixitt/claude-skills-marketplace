@@ -17,12 +17,17 @@
     {
       "name": "x-writing-plugin",
       "source": "./plugins/x-writing-plugin",
-      "description": "X (Twitter) writing skill — write, edit, rewrite, or humanize content for X/Twitter. Handles tweets, threads, hooks, tone, engagement, and personal brand voice. Combines viral thread engineering with a 29-pattern anti-AI humanizer for the startup/AI/tech space."
+      "description": "X (Twitter) writing skill \u2014 write, edit, rewrite, or humanize content for X/Twitter. Handles tweets, threads, hooks, tone, engagement, and personal brand voice. Combines viral thread engineering with a 29-pattern anti-AI humanizer for the startup/AI/tech space."
     },
     {
       "name": "x-articles-plugin",
       "source": "./plugins/x-articles-plugin",
-      "description": "X (Twitter) Articles writing skill — write, structure, and optimize long-form Articles on X Premium. Handles drafting, title/hook optimization, section structure, companion tweets, banner image concepts, and repurposing threads/essays into Articles. Different from x-writing (threads/tweets) — Articles are Medium-style blog posts with rich formatting."
+      "description": "X (Twitter) Articles writing skill \u2014 write, structure, and optimize long-form Articles on X Premium. Handles drafting, title/hook optimization, section structure, companion tweets, banner image concepts, and repurposing threads/essays into Articles. Different from x-writing (threads/tweets) \u2014 Articles are Medium-style blog posts with rich formatting."
+    },
+    {
+      "name": "oss-scout-plugin",
+      "source": "./plugins/oss-scout-plugin",
+      "description": ">"
     }
   ]
 }

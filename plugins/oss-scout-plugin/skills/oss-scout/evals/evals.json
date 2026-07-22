@@ -1,0 +1,92 @@
+{
+  "skill_name": "oss-scout",
+  "evals": [
+    {
+      "id": 0,
+      "name": "resume-impact-broad",
+      "prompt": "Find me open source repos worth contributing to this week — I don't care about language, just want something that'll actually move the needle on my resume and GitHub profile.",
+      "expected_output": "A ranked list of 5-10 repos with per-factor scores (Recognizability, Contributability, Role-fit), each with 'why it scored well' and 'market context' explaining hiring relevance. Should include repos from recognizable orgs or with high star counts, that are actively reviewing PRs.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "produces_ranked_list",
+          "type": "contains",
+          "description": "Output contains a ranked/numbered list of repos with owner/repo format",
+          "check": "At least 5 repos listed in owner/repo format with scores"
+        },
+        {
+          "name": "shows_three_factor_scores",
+          "type": "contains",
+          "description": "Each repo entry shows Recognizability, Contributability, and Role-fit sub-scores",
+          "check": "All three factor names appear with numeric scores for each entry"
+        },
+        {
+          "name": "includes_market_context",
+          "type": "contains",
+          "description": "Each entry has market context explaining why it matters for hiring",
+          "check": "Each repo entry includes a section about who uses it or why it's relevant to careers"
+        },
+        {
+          "name": "flags_ai_policy_if_applicable",
+          "type": "conditional",
+          "description": "If any recommended repo has a known AI ban (Gentoo, curl), it's flagged",
+          "check": "Any repo with known AI restrictions is flagged with a warning, not silently excluded"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "ai-agents-focused",
+      "prompt": "I want to contribute to something in the AI agents space, ideally something recognizable enough that a recruiter would know the name.",
+      "expected_output": "A ranked list focused on AI/agents repos — things like LangChain, CrewAI, AutoGen, Semantic Kernel, or similar. Should prioritize repos where the name carries weight in AI hiring conversations, while still being contributable (responsive maintainers, open issues).",
+      "files": [],
+      "assertions": [
+        {
+          "name": "ai_agents_domain_focus",
+          "type": "contains",
+          "description": "All or nearly all recommended repos are in the AI/agents/LLM space",
+          "check": "At least 4 of the top 5 repos are clearly AI/agents/LLM related"
+        },
+        {
+          "name": "recognizable_names",
+          "type": "contains",
+          "description": "Includes at least some repos a recruiter would plausibly recognize",
+          "check": "At least 2 repos have 5K+ stars or are in a known company org"
+        },
+        {
+          "name": "contributability_evidence",
+          "type": "contains",
+          "description": "Shows evidence repos are actually accepting contributions (not just famous but dead)",
+          "check": "Mentions recent commit activity, open issues, or PR review responsiveness for each"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "trending-weekly",
+      "prompt": "What's trending on GitHub this week that I could contribute to? I want to catch a wave — something gaining stars fast where early contributors get noticed.",
+      "expected_output": "A list emphasizing star velocity and recency over sheer size. Should surface repos created recently OR experiencing a surge, with evidence of growth rate. Still needs to pass basic contributability checks (not just viral repos with no issues/PRs).",
+      "files": [],
+      "assertions": [
+        {
+          "name": "velocity_signal_present",
+          "type": "contains",
+          "description": "Output mentions growth rate, trending status, or star velocity for repos",
+          "check": "At least 3 repos have some velocity/trending/growth signal mentioned"
+        },
+        {
+          "name": "recency_emphasis",
+          "type": "contains",
+          "description": "Repos are recent or recently surging, not just old established projects",
+          "check": "At least 2 repos are either created in last 6 months OR explicitly described as trending"
+        },
+        {
+          "name": "still_contributable",
+          "type": "contains",
+          "description": "Trending repos are still checked for basic contributability (not just hype)",
+          "check": "Mentions open issues, community activity, or PR review status — not just star count"
+        }
+      ]
+    }
+  ]
+}
