@@ -1,0 +1,4 @@
+{
+  "name": "phantom-scribe-code-plugin",
+  "description": "Generate code that reads as human-written by an experienced developer. Use whenever the user asks to write code that should appear naturally human-authored, avoid AI detection in code, write 'authentic' or 'natural' code, produce code with realistic developer fingerprints, or requests code that doesn't look AI-generated. Also trigger when writing functions, classes, scripts, tests, configs, or full files where the user has previously indicated they want human-natural code output. Applies to ALL programming languages. Do NOT use for prose writing, documentation paragraphs, or explanations \u2014 those need phantom-scribe-text instead."
+}
