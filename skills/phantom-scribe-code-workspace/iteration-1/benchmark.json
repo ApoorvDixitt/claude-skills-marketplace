@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "skill_name": "phantom-scribe-code",
+    "skill_path": "/Users/dixitt_ji/claude-skills-marketplace/skills/phantom-scribe-code",
+    "executor_model": "claude-opus-4-6-v1",
+    "analyzer_model": "claude-opus-4-6-v1",
+    "timestamp": "2026-07-25T13:30:00Z",
+    "evals_run": ["eval-1-rate-limiter", "eval-2-jwt-middleware", "eval-3-file-watcher"],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": "eval-1-rate-limiter",
+      "eval_name": "python-rate-limiter",
+      "with_skill": {
+        "pass_rate": 1.0,
+        "assertions_passed": 6,
+        "assertions_total": 6,
+        "tokens": 41083,
+        "duration_seconds": 247.1
+      },
+      "without_skill": {
+        "pass_rate": 0.0,
+        "assertions_passed": 0,
+        "assertions_total": 6,
+        "tokens": 31803,
+        "duration_seconds": 148.8
+      }
+    },
+    {
+      "eval_id": "eval-2-jwt-middleware",
+      "eval_name": "typescript-jwt-middleware",
+      "with_skill": {
+        "pass_rate": 1.0,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "tokens": 41588,
+        "duration_seconds": 248.7
+      },
+      "without_skill": {
+        "pass_rate": 0.4,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "tokens": 31867,
+        "duration_seconds": 46.2
+      }
+    },
+    {
+      "eval_id": "eval-3-file-watcher",
+      "eval_name": "go-file-watcher-cli",
+      "with_skill": {
+        "pass_rate": 1.0,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "tokens": 41539,
+        "duration_seconds": 273.0
+      },
+      "without_skill": {
+        "pass_rate": 0.4,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "tokens": 31970,
+        "duration_seconds": 332.7
+      }
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate_mean": 1.0,
+      "tokens_mean": 41403,
+      "time_mean_seconds": 256.3
+    },
+    "without_skill": {
+      "pass_rate_mean": 0.27,
+      "tokens_mean": 31880,
+      "time_mean_seconds": 175.9
+    },
+    "delta": {
+      "pass_rate": "+0.73",
+      "time_seconds": "+80.4",
+      "tokens": "+9523"
+    }
+  },
+  "notes": [
+    "With-skill code passes 100% of human-naturalness assertions across all 3 languages",
+    "Baseline code passes 0-40% — it is functionally correct but exhibits clear AI tells",
+    "Cost: ~30% more tokens and variable time increase (skill adds reasoning overhead)",
+    "Key differentiators: naming diversity, comment authenticity, structural variance, evolution artifacts",
+    "Baseline consistently fails on: evolution artifacts, comment authenticity, error handling variety"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "eval_id": 1,
+  "run_type": "without_skill",
+  "expectations": [
+    {
+      "text": "naming_diversity",
+      "passed": false,
+      "evidence": "Consistently descriptive naming throughout: max_requests, window_seconds, _timestamps, wait_time, deficit. No abbreviated or contextual names. _evict_expired is the only slightly terse name."
+    },
+    {
+      "text": "comment_authenticity",
+      "passed": false,
+      "evidence": "Comments explain WHAT not WHY: '# Sleep briefly before retrying', 'Number of requests available in the current window'. Full Args/Returns docstrings on abstract methods. No TODOs, no references to real events."
+    },
+    {
+      "text": "structural_variance",
+      "passed": false,
+      "evidence": "All classes follow identical template: __init__ with validation, main method with same timeout/deadline pattern, reset() method, property. Very uniform structure."
+    },
+    {
+      "text": "error_handling_inconsistency",
+      "passed": false,
+      "evidence": "Identical input validation pattern in both concrete classes (raise ValueError for <=0). Same try/acquire/timeout pattern everywhere. Perfectly uniform."
+    },
+    {
+      "text": "evolution_artifacts",
+      "passed": false,
+      "evidence": "No signs of code evolution. Everything is perfectly clean, consistent, and intentional. No TODOs, no leftover constants, no style drift, no defensive checks from past bugs."
+    },
+    {
+      "text": "no_over_documentation",
+      "passed": false,
+      "evidence": "Formulaic docstrings with Args/Returns on abstract method. Example blocks in class docstrings for simple classes. Full descriptive docstrings on every class and public method."
+    }
+  ],
+  "pass_rate": 0.0
+}

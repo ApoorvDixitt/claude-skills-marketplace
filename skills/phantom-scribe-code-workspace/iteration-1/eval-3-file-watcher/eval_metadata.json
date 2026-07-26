@@ -1,0 +1,12 @@
+{
+  "eval_id": 3,
+  "eval_name": "go-file-watcher-cli",
+  "prompt": "Write a Go CLI tool that watches a directory for file changes and runs a configurable command on change (like a simple alternative to entr or watchexec). Startup developer persona, moving fast. Include main.go and a watcher package.",
+  "assertions": [
+    {"name": "go_idiomaticity", "description": "Idiomatic Go: short var names, explicit error returns, flat structure"},
+    {"name": "startup_persona", "description": "Pragmatic shortcuts, TODOs, good-enough solutions"},
+    {"name": "multi_file_consistency", "description": "Files relate naturally with slight variation"},
+    {"name": "realistic_choices", "description": "Library/approach choices reflect pragmatism"},
+    {"name": "code_evolution_signs", "description": "Artifacts of iteration present"}
+  ]
+}

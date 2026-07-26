@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "python-rate-limiter",
+  "prompt": "Write a Python module that handles rate limiting for an API client. It should support sliding window and token bucket algorithms. This is for a mid-level developer working on a mature SaaS codebase.",
+  "assertions": [
+    {"name": "naming_diversity", "description": "Uses a mix of abbreviated and descriptive names"},
+    {"name": "comment_authenticity", "description": "Comments explain WHY not WHAT, includes TODO/HACK/ticket refs"},
+    {"name": "structural_variance", "description": "Function lengths vary, not all same template shape"},
+    {"name": "error_handling_inconsistency", "description": "Error handling varies by context"},
+    {"name": "evolution_artifacts", "description": "Signs of code evolution present"},
+    {"name": "no_over_documentation", "description": "No formulaic docstrings on trivial methods"}
+  ]
+}

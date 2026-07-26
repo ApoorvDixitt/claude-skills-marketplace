@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "typescript-jwt-middleware",
+  "prompt": "Write a TypeScript Express middleware for JWT authentication with role-based access control. Senior developer persona, production codebase. Include the middleware, types, and a helper for token validation.",
+  "assertions": [
+    {"name": "senior_persona_match", "description": "Reflects senior dev style: concise, pragmatic, sparse comments"},
+    {"name": "typescript_idiomaticity", "description": "Uses TypeScript idiomatically with proper typing"},
+    {"name": "import_authenticity", "description": "Imports look realistic, not all top-result libraries"},
+    {"name": "no_ai_smell", "description": "Would not raise suspicion in code review"},
+    {"name": "realistic_error_messages", "description": "Error messages sound developer-written, not formal"}
+  ]
+}

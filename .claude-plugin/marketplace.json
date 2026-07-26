@@ -38,6 +38,11 @@
       "name": "phantom-scribe-code-plugin",
       "source": "./plugins/phantom-scribe-code-plugin",
       "description": "Generate code that reads as human-written by an experienced developer. Use whenever the user asks to write code that should appear naturally human-authored, avoid AI detection in code, write 'authentic' or 'natural' code, produce code with realistic developer fingerprints, or requests code that doesn't look AI-generated. Also trigger when writing functions, classes, scripts, tests, configs, or full files where the user has previously indicated they want human-natural code output. Applies to ALL programming languages. Do NOT use for prose writing, documentation paragraphs, or explanations \u2014 those need phantom-scribe-text instead."
+    },
+    {
+      "name": "dynamo-plugin",
+      "source": "./plugins/dynamo-plugin",
+      "description": "Complete Project Dynamo / Terminal-Bench 2 (TB2) task authoring system for Handshake AI fellowship work. Use this skill whenever working on ANY Dynamo-related task \u2014 claiming tasks, writing portal proposals, designing difficulty mechanisms, building task repos (solve.sh, Dockerfile, tests, instruction.md, task.toml), calibrating with Harbor (oracle/nop), hardening verifiers against agent cheating, reading CI verdicts, triaging infrastructure failures, pushing PRs, or submitting for review. Also trigger when the user mentions: dynamo, terminal-bench, harbor, task.toml, instruction.md, pass@2, pass@5, oracle, nop, verifier, deep_review, Model A, proposal, STRENGTHENING, FREEZE, garden path, stump the model, difficulty gate, anti-cheat, battery, proxy solver, trip rate, fairness, or any Dynamo task slug. This is the SINGLE entry point for all Dynamo work \u2014 it routes to the correct phase-specific reference automatically."
     }
   ]
 }
