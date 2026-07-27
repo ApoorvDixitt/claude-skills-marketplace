@@ -277,10 +277,11 @@ The `scratch-vt3/` stack is the template (kept outside the repo; never committed
   artifact, runs the REAL harbor verifier, asserts reward 0.
 - `build_data.py` — emits final data into the repo and re-verifies the trap on repo paths.
 
-Windows/env: harbor at `C:/Users/Lenovo/.local/bin/harbor.exe`; `export MSYS_NO_PATHCONV=1`
-before any `docker run ... /bin/bash`; host python is `python`; confirm `docker info` first
-(a down daemon makes harbor silently produce no jobs). Push to the FORK remote (origin is
-pull-only, 403). Never push while an eval runs (cancels it, burns a slot).
+Environment: harbor installed via `uv tool install harbor` (in `~/.local/bin` on macOS/Linux,
+`C:/Users/<username>/.local/bin` on Windows). On Windows Git Bash: `export MSYS_NO_PATHCONV=1`
+before any `docker run ... /bin/bash`. Confirm `docker info` first (a down daemon makes harbor
+silently produce no jobs). Push to the FORK remote (origin is pull-only, 403). Never push while
+an eval runs (cancels it, burns a slot).
 
 ---
 
@@ -321,10 +322,12 @@ pull-only, 403). Never push while an eval runs (cancels it, burns a slot).
 
 ## 12. Gate mechanics quick-reference
 
-Pipeline (sequential, AND-ed): review → similarity → validation → pass2 → deep_review →
-trials → gate. Each gates the next; every push re-runs all and cancels the in-flight run.
+Pipeline (sequential, AND-ed): Static → Rubric → Duplicate → Validation → Pass@2 →
+Automated Review → AVA → Adversarial Cheat-Pass (advisory) → Per-Check QC → Pass@5 → gate.
+All gating stages must pass; advisory stages post comments but never block. Each gates the next; every push re-runs all and cancels the in-flight run.
 - **pass@2** (pre-check): passes iff ≥1 VALID failure (finished, wrong, fair).
-- **pass@5** (real gate): passes iff ≥3 fails total AND ≥1 good valid fail; accept ≤2/5 solves.
+- **pass@5** (real gate): passes when the agent fails at least 3 of 5 attempts. Acceptance
+  band: 0–2/5 accepted, 3–5/5 rejected. A 0/5 of valid failures is the strongest result.
   Ceiling = 0/5 solved, avg@5 0.000 (hit by restore-archive and fix-transfer-pipeline).
 - **Valid vs invalid:** valid = finished-and-wrong on a fair prompt. Invalid = timeout
   (in-progress or soft), ambiguity, reward-hack, refusal, verifier defect. Only valid advances.

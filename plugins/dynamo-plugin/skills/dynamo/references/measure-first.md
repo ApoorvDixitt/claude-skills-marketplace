@@ -82,7 +82,11 @@ If you have not measured both, you are guessing, and guessing costs commits.
 ## Hard-won cautions (the exact traps that cost retain-board its extra commits)
 
 - **Don't push blind.** If you have only proven `oracle=1.0`, you have measured nothing about difficulty or fairness. That is the 20-commit trap.
-- **The Handshake submission doc is TB3.** The "You have N seconds…" line it lists as a hard gate is an **AUTOMATIC FAIL** for a **TB2** `review` (`instruction_concision`) — the agent budget lives ONLY in `task.toml [agent].timeout_sec`. When a doc contradicts empirical CI (a prior run that passed `review` without it), **trust the CI.**
+- **The timeout suffix line is NOW REQUIRED by the current platform (June 2026 update).** The
+  static check `check-instruction-suffix` enforces it. Earlier repos that passed without it
+  were under an older rubric version. For all current tasks: include the line, keep N in sync
+  with `[agent].timeout_sec`. If your specific repo's `.dynamo/dynamo-rubric.toml` overrides
+  this, trust the repo rubric — but the default is: include it.
 - **Read the failure reason before reacting.** A 3-minute pass2 "fail" was pure Daytona infra; a `review` fail was one added line. Grepping the job log for the actual verdict saved a wrong "fix."
 - **Two reviewers, not one.** A single strict `/app`-only reviewer will scream UNFAIR at the exact design that wins — because `deep_review` reads `task.toml` and it doesn't. Always run the faithful (task.toml-aware) reviewer to predict the real gate.
 - **Infra != merit.** Daytona auth errors, DNS outages, quota — never a task defect. Diagnose, then re-trigger.

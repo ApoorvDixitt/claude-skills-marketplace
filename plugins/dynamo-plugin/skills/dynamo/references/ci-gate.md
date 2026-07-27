@@ -17,8 +17,11 @@ On every push to the PR branch, one GitHub Actions workflow (`Dynamo Review`, tr
 to the PR title/body) runs these jobs **strictly in sequence**, each gating the next:
 
 ```
-review  ->  similarity  ->  validation  ->  ratelimit  ->  pass2  ->  deep_review  ->  trials  ->  gate
-(static+rubric) (dup)      (oracle/nop)   (slot)      (pass@2)   (LLM audit)    (pass@5)   (verdict)
+1. Static checks  ->  2. Rubric review  ->  3. Duplicate check  ->  4. Validation  ->  5. Pass@2
+   (structure)          (LLM rubric)         (similarity)            (oracle/nop)      (2 trials)
+
+->  6. Automated Review  ->  7. AVA  ->  8. Adversarial Cheat-Pass  ->  9. Per-Check QC  ->  10. Pass@5
+    (deep rubric, GATES)    (GATES)     (advisory, never blocks)       (soundness, GATES)    (5 trials)
 ```
 
 Load-bearing facts about the order:
@@ -56,7 +59,9 @@ must be green, they are cheap and non-negotiable):
   `/logs/verifier/reward.txt` (not pre-created); nothing installed at verify time.
 Failing it is always a mechanical fix; it never blocks on judgment. Fix and move on.
 
-### 1B. The rubric + deep-review bot (LLM, `review` then `deep_review` jobs)
+### 1B. The rubric + Automated Review bot (LLM, `review` then `deep_review` jobs)
+Note: In CI job names this still appears as `deep_review`, but the PR comment and
+platform docs call it **Automated Review**.
 Two LLM passes, both from the SAME shipped rubric file (`references/dynamo-rubric.toml` in
 the repo — read it; it is the exact 361-line checklist). The early `review` pass writes the
 `<!-- dynamo-eval -->` verdict; the later `deep_review` writes `## Automated Review`
@@ -87,6 +92,31 @@ seen in every trajectory across both projects:
 6. Never reward-hacks, never refuses on a fair prompt; either finishes or times out.
 What this means for you is the whole of section 4.
 
+### 1D. AVA — Adversarial Verifier Audit (gates, runs after Pass@2)
+
+Attacks the VERIFIER blind — reconstructs what it accepts without trusting the solution, then
+tries to break the boundary:
+- **False accept** — an invalid submission that earns reward 1 (verifier too loose)
+- **False reject** — a valid submission the verifier wrongly fails (too strict)
+
+Posts `routing: pass/block`. Major findings block; Minor are advisory. Empty output = fail
+(fail-closed). A blocking Major describes the hole + how to close it.
+
+Counter-play: the full anti-cheat battery in `verifier-hardening.md` pre-empts AVA. If you've
+run the battery (probes A–H) and they all score 0, AVA will pass.
+
+### 1E. Adversarial Cheat-Pass (advisory only, never blocks)
+
+A focused red-team that tries to build a passing submission WITHOUT doing the real work — a
+stub, hardcoded answer, or shortcut. Runs with `task.toml` hidden. On FAIL it posts the
+concrete exploit code + fix.
+
+### 1F. Per-Check QC — Task Soundness (gates, runs after Automated Review + AVA pass)
+
+A second, independent tier of 41–44 automated checks and probes. Each blocking issue uses
+three-part format: **What this means** / **What we found** / **Fix**.
+Pass@5 does NOT run until QC passes.
+
 ---
 
 ## 2. The gate arithmetic — the exact accept/reject math
@@ -100,10 +130,13 @@ What this means for you is the whole of section 4.
 - `Rerun Recommended: YES` means the result was inconclusive (an unanalyzed/errored trial),
   not that your task is wrong — re-trigger identical content.
 
-### pass@5 (the `trials` job; the real gate)
-- Verdict comment: `## Agent Trial Results`, breakdown:
-  `X solved · Y good-valid-fail · Z soft-timeout-fail · ... · avg@5=N`.
-- **Passes iff >=3 total fails AND >=1 GOOD valid fail** (stated verbatim in the gate step
+### pass@5 (the `trials` job; the real difficulty gate)
+- **Passes when the agent fails at least 3 of 5 attempts.**
+- Acceptance band: **0–2/5 accepted** (0/5 with valid failures is the strongest result).
+- **3–5/5 rejected** — the task is too easy.
+- A "0/5" made of timeouts or agent/verifier errors is BROKEN, not hard — fix the cause.
+- Valid failure = the model FINISHED and was WRONG on a fair prompt (not timeout, not infra).
+- Historical: **Passes iff >=3 total fails AND >=1 GOOD valid fail** (stated verbatim in the gate step
   name: "Difficulty gate (>=3 fails total, >=1 valid fail)"). Timeouts COUNT toward the 3;
   only the one anchor must be a genuine finished-and-wrong (or stuck-with-valid-approach).
 - Acceptance target: <=2 of 5 solves with an anchor. The accepted restore-archive scored
@@ -146,6 +179,46 @@ What to extract, in order:
 4. **Golden-vs-agent value table:** how close the best wrong candidate was (e.g. matched the
    extreme_count exactly, off by 0.02 on means) — tells you if the trap fired as designed.
 5. **For deep_review:** the single Blocking Issue and its prescribed fix, verbatim.
+
+---
+
+## 3.5. The Automated Review — what it checks and how to act on it
+
+The Automated Review (internally `deep_review`) is a deep gap-rubric review that runs on
+every PR after Pass@2 and before Pass@5.
+
+**Important framing: The Automated Review is a floor, not a ceiling.** Passing it is necessary
+but not sufficient — human reviewers are stricter.
+
+### What it posts
+
+- **Verdict:** PASS or FAIL
+- **Blocking Issues:** Each names the file, explains the defect, ends with a concrete fix.
+- **Advisory Notes:** Never block.
+- **Deep-review assessment** (collapsible): requirement→assertion map, trajectory analysis.
+
+### What it flags most often
+
+1. Test coverage — a requirement has no matching assertion
+2. Correct expected values — buggy golden
+3. Fixture/tamper independence — ground truth on agent-writable path
+4. Traceability — instruction/solution/tests describe different tasks
+5. Clean agent traces — reward hacking attempts
+6. Difficulty evidence — failures are timeouts, not the intended crux
+
+### How to act on it
+
+1. On FAIL → go to Blocking Issues → fix is written in each one. Fix, commit, push.
+2. Read Advisory Notes — they predict human reviewer flags.
+3. A FAIL is not a rejection. It’s the gate telling you what to fix before Pass@5.
+4. It’s a lottery per run — harden the WHOLE class, not just the named instance.
+
+### Pre-empting it locally
+
+- Map every test to an instruction criterion and back (1:1)
+- Confirm expected values independently
+- Verify ground truth isn’t on any agent-writable path
+- Ensure instruction → solution → tests all match
 
 ---
 
@@ -313,3 +386,16 @@ commit.
     to reach 0/2; restore-archive took a long chain of infra deaths and lottery findings to
     reach 0/5. Both ACCEPTED. Read every verdict, fix one diagnosed thing, re-prove, push
     again. The wall yields to diagnosis plus a proof stack, not to cleverness or luck.
+
+
+---
+
+## 8. The revision workflow
+
+- **Revisions outrank new work.** Fix sent-back tasks before claiming new ones.
+- **Maximum 2 revisions allowed.** After two rounds → Holding-Rejection.
+- **Read the feedback first.** Most common: undisclosed verifier rules, contradictions, ambiguity.
+- **Re-run oracle + nop after every revision.**
+- **Push to the same branch** — don’t open a new PR.
+
+Pipeline: Sent back → Revision 1 → Re-review → Revision 2 → Re-review → Holding-Rejection.

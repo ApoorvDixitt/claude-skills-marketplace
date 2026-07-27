@@ -255,7 +255,7 @@ this project; each line is a rule earned the hard way.
 | Engine counted **2022** losses in `wash_sale_loss_disallowed` | The report covers 2023 only | Guard every reported figure by the **reported tax year.** |
 | v5 hid a "custom broker tax convention" for matching order | **Treas. Reg. §1.1091-1 pins earliest-first** → the convention was a legal contradiction, making failures unfair | **Websearch the domain** before hiding a convention; if the law fixes it, reframe as **"reproduce the legacy engine"** (nothing in data is wrong, it is just what the engine did). |
 | A test **docstring named `solve.py`** | The static bot read it as an undocumented artifact → fail | **Never name solution files** anywhere agent-visible OR in tests. |
-| Included the platform-mandated **timeout suffix line** | This repo's rubric forbids it | **Repo rubric outranks platform docs** on any conflict. |
+| Included the platform-mandated **timeout suffix line** on a repo whose rubric forbade it | That specific repo's rubric (`dynamo-rubric.toml`) had a stricter rule | Check your specific repo's `.dynamo/dynamo-rubric.toml` — the CURRENT platform default REQUIRES the timeout line. Only omit if your repo's rubric explicitly overrides. |
 | Ran calibration with **Docker daemon down** | Harbor silently produced no jobs; looked like a pass that wasn't | Confirm `docker info` succeeds first; if down, start Docker Desktop or use the plain-Python verifier replica. |
 | Tried to `git push origin` | The account is **pull-only on origin (403)**; the PR is served from the **fork** | Push to the **fork** remote (`git push fork <branch>`); origin is read-only. |
 | Considered "confusing high English" to trip the agent | Ambiguity = invalid failure = rejection | Difficulty goes in **arithmetic to reconstruct**, never in prose to misread. |
@@ -319,7 +319,7 @@ For any build or self-review, check each axis and name what would wrongly pass/f
 
 | Axis | What breaks it |
 |---|---|
-| **Format (`task.toml`)** | `artifacts` not a top-level array, or path ≠ what the task writes; missing/edited pre-seeded fields; forbidden fields (`avg_at_8`, `tags`, `schema_version`); personal info |
+| **Format (`task.toml`)** | `artifacts` not a top-level array, or path ≠ what the task writes; missing/edited pre-seeded fields; forbidden fields (`tags`, `schema_version` — `avg_at_8` was fully removed); personal info |
 | **Environment (Dockerfile)** | unpinned/floating base (must be approved + `@sha256`); solution or tests COPYed in (leak); unpinned pip; missing `mkdir -p /app`; deps only the oracle needs |
 | **Verifier (`tests/`)** | asserts existence/non-empty instead of real values; reward written anywhere but `/logs/verifier/reward.txt`; no `ctrf.json`; verify-time installs; nondeterminism; enforcing anything the instruction never states (undisclosed literals, tie-breaks, dedup) — **the #1 rejection cause** |
 | **Instruction** | vague; no absolute paths; output file/schema unnamed; a requirement the tests enforce but the prose never states; the answer leaked (including in an example value) |
@@ -342,24 +342,15 @@ For any build or self-review, check each axis and name what would wrongly pass/f
 
 ---
 
-## 11. Environment & submission caveats (so the tooling never lies to you)
+## 11. Environment & submission caveats
 
-Windows / this machine:
-- **harbor** lives at `C:/Users/Lenovo/.local/bin` — `export PATH="$PATH:/c/Users/Lenovo/.local/bin"` per shell.
-- **`export MSYS_NO_PATHCONV=1`** before any `docker run ... /bin/bash` (Git Bash mangles paths).
-- Host python is **`python`** (3.14), not `python3`; use `python -m uv` if bare `uv` is missing.
-- **Docker Desktop must be running** — a down daemon makes harbor silently produce no jobs (looks like a pass). Confirm `docker info` first.
-- **LF endings:** `git ls-files --eol` is authoritative; the CRLF *warnings* on push are about the working copy, not the committed blob.
-- The reasoning **classifier is intermittently unavailable** ("temporarily unavailable") — wait and retry; read-only tools still work meanwhile.
+- **harbor** installed via `uv tool install harbor` — lives in `~/.local/bin` (macOS/Linux)
+  or `C:/Users/<username>/.local/bin` (Windows). Ensure it's in PATH.
+- On Windows Git Bash: **`export MSYS_NO_PATHCONV=1`** before any `docker run ... /bin/bash`.
+- **Docker Desktop must be running** — confirm `docker info` first.
+- Push to the **FORK** remote (origin is pull-only, 403). Never push while eval runs.
+- After anything is pasted into a submission form, **the repo is FROZEN** — no edits.
 
-Submission mechanics:
-- The PR is served from your **fork**, and the account is **pull-only on origin
-  (push → 403)** — commit locally, then **`git push fork <branch>`**.
-- **Never push while an eval is running** — it cancels the run and burns a pass@2
-  slot (~6/day). Watch `gh pr checks`; act only when nothing is pending.
-- PR *body* edits and skill/memory files don't trigger CI — safe anytime.
-- After anything is pasted into a submission form, **the repo is frozen** — a
-  paste↔repo mismatch is a named rejection cause.
 
 ---
 

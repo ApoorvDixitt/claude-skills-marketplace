@@ -1,10 +1,15 @@
 
-# The two gatekeepers of a Dynamo PR
+# The evaluation agents — bot behavior and counter-play
 
-Every push to a task PR triggers a pipeline with two intelligent gates. They
-have different jobs, different failure modes, and different counter-play.
-Everything below is observed behavior (v1–v10 of cost-basis-reconcile,
-2026-07), not speculation.
+Every push to a task PR triggers a 10-stage pipeline with multiple intelligent gates.
+This file covers the two PRIMARY agent-based gates you design against: the review/eval
+bot (quality) and Model A (difficulty). For the full pipeline including AVA, Per-Check QC,
+and Adversarial Cheat-Pass, see `ci-gate.md`. Everything below is observed behavior
+(v1–v10 of cost-basis-reconcile + later projects, 2026-07), not speculation.
+
+Note: The pipeline now also includes AVA (Adversarial Verifier Audit), Adversarial
+Cheat-Pass (advisory), and Per-Check QC (Task Soundness) — all running between Pass@2
+and Pass@5. See ci-gate.md §1D–1F for those gates.
 
 ## Bot 1 — the review/eval bot (quality gate)
 
@@ -22,8 +27,10 @@ Runs as the `review / review`, `similarity`, and `validation` jobs plus the
    killer), explanation fields against the actual verifier, instruction
    clarity. CRITICAL precedent: it FAILED a push for containing the platform
    docs' mandated "You have N seconds…" suffix line — **this repo's rubric
-   outranks the platform instructions**. When repo rubric and platform docs
-   conflict, the rubric wins. Do not re-add that line.
+   outranked the platform instructions for that specific repo.** When your repo's
+   `.dynamo/dynamo-rubric.toml` and platform docs conflict, the repo rubric wins. But the
+   CURRENT platform default requires the timeout suffix line — only omit if your specific
+   repo's rubric explicitly forbids it. Always check `.dynamo/dynamo-rubric.toml`.
 3. **Similarity/duplicate check** against the existing task corpus. Passing
    verdict: "UNIQUE".
 4. **Validation job**: builds the image, runs oracle (expect 1.0) and nop

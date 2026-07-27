@@ -7,6 +7,13 @@ gate (`anti_cheat`, `trivial_bypasses_blocked`, `verifier_configuration`,
 `functional_verification`, `fixtures_and_tamper_independence`, `graceful_failure`) as a
 battery you run, not a checklist you eyeball.
 
+**Pipeline context (June 2026):** The CI pipeline now includes an **AVA (Adversarial Verifier
+Audit)** stage that runs after Pass@2 and GATES the PR. It attacks your verifier blind — trying
+false-accept and false-reject probes. Running the battery in this file pre-empts AVA findings.
+A task also faces an advisory **Adversarial Cheat-Pass** (red-teams whether tests can be gamed
+without solving). Both target the same weaknesses this battery catches.
+
+
 Companion runnable: `battery.py` in this folder automates the task-agnostic probes. This
 file is the brain; run the script, then apply the fixes below to anything it flags.
 

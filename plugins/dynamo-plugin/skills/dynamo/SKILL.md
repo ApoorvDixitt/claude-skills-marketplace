@@ -34,9 +34,16 @@ Then read the indicated reference file for detailed instructions.
 | "proposal", "claim", "portal", "Check Proposal Quality", "STRENGTHENING", "FREEZE", "paste" | Proposal authoring | `references/proposal.md` |
 | "build", "solve.sh", "Dockerfile", "tests/", "instruction.md", "task.toml", "Phase C", "Phase D" | Task building | `references/task-build.md` |
 | "push", "CI", "red check", "verdict", "review job", "pipeline", "re-trigger", "infra" | CI gate navigation | `references/ci-gate.md` |
+| "automated review", "PASS verdict", "FAIL verdict", "blocking issues", "advisory notes", "deep_review" | Automated Review | `references/ci-gate.md` |
+| "AVA", "verifier audit", "false accept", "false reject", "Major finding" | Verifier hardening | `references/verifier-hardening.md` |
+| "QC", "task soundness", "Per-Check", "soundness checks", "probes" | CI gate navigation | `references/ci-gate.md` |
+| "cheat-pass", "adversarial cheat", "can tests be gamed" | Verifier hardening | `references/verifier-hardening.md` |
+| "common errors", "rejected", "why rejected", "flagged", "self-check", "before submit" | Common errors & self-check | `references/common-errors.md` |
 | "difficulty", "stump", "hard", "garden path", "remove the gradient", "mechanism A/B", "pass@2 solved" | Difficulty design | `references/hard-task-craft.md` |
+| "stump", "stumping patterns", "patterns A-I", "amplifiers", "make it hard", "how to stump" | Difficulty patterns | `references/hard-task-craft.md` |
 | "Model A", "GPT-5.4", "Terminus-2", "agent behavior", "trajectory", "how it solved" | Bot behavior analysis | `references/bots.md` |
-| "verifier", "anti-cheat", "battery", "impenetrable", "hardening", "deep_review finding" | Verifier hardening | `references/verifier-hardening.md` |
+| "verifier", "anti-cheat", "battery", "impenetrable", "hardening" | Verifier hardening | `references/verifier-hardening.md` |
+| "revision", "sent back", "reviewer feedback", "R1", "R2", "holding-rejection" | Revision workflow | `references/ci-gate.md` |
 | "measure", "proxy solver", "trip rate", "fairness reviewer", "task.toml-aware", "blind pushing" | Measure-first method | `references/measure-first.md` |
 | Starting a NEW task from scratch, "new claim", "which mechanism", "how to start" | Strategic overview | `references/master-playbook.md` |
 | "file structure", "Harbor commands", "install harbor", "task categories", "payment" | Official rules lookup | `references/official-guide.md` |
@@ -57,8 +64,11 @@ These ten rules override everything. A violation in any one fails CI or review:
    reading the Dockerfile.
 2. **Base image: approved list + `@sha256` digest pin.** Pin pip versions exact; do NOT pin apt.
 3. **`instruction.md` format:** prompt-style, absolute `/app/` paths, every output file + schema
-   disclosed, "what" never "how", ≤1500 o200k tokens. NO timeout suffix line (this repo's rubric
-   forbids it — repo rubric outranks platform docs on any conflict).
+   disclosed, "what" never "how", ≤1500 o200k tokens. MUST end with the exact line: "You have N
+   seconds to complete this task. Do not cheat by using online solutions or hints specific to
+   this task." (N = `[agent].timeout_sec`). A static check (`check-instruction-suffix`) enforces
+   this. Exception: only omit if your specific repo's `.dynamo/dynamo-rubric.toml` explicitly
+   overrides this requirement.
 4. **Verifier rules:** real-value assertions (never existence-only); reward to
    `/logs/verifier/reward.txt`; `ctrf.json` to `/logs/verifier/`; `test.sh` exits 0 always;
    no installs at verify time; deterministic; strict 1:1 with instruction (the #1 rejection cause:
@@ -70,6 +80,9 @@ These ten rules override everything. A violation in any one fails CI or review:
    `docker info` first (a down daemon makes harbor silently produce no jobs).
 8. **A failure counts only if the model FINISHED and was WRONG on a fair prompt.** Timeouts,
    ambiguity, infra errors, and reward-hacking are all invalid. Design for "finished-and-wrong."
+   Note: The "repo rubric outranks platform docs" principle was proven on one specific historical
+   repo. For NEW tasks, always check your repo's `.dynamo/dynamo-rubric.toml` for the actual
+   enforcement. The CURRENT platform default requires the timeout suffix line.
 9. **Uniqueness is non-negotiable.** The visible evidence must pin exactly ONE answer. Prove with
    the cross-product rival probe (every plausible reading × every dial — exactly one match).
 10. **Read before edit, always.** Never modify a file without reading it first. Never push while
@@ -148,14 +161,27 @@ The difference between 20 commits and 4 is: **learn locally, push to confirm.**
 
 ---
 
-## 8. Environment Quirks (Windows host)
+## 8. Environment Quirks
 
-- **harbor** at `C:/Users/Lenovo/.local/bin` — `export PATH="$PATH:/c/Users/Lenovo/.local/bin"`.
-- **`export MSYS_NO_PATHCONV=1`** before any `docker run ... /bin/bash` (Git Bash path mangling).
-- Host python is **`python`** (3.14), not `python3`.
-- **Docker Desktop must be running** — confirm `docker info` first.
+### All platforms
+- **Docker Desktop must be running** — confirm `docker info` first. A down daemon makes harbor
+  silently produce no jobs (looks like a pass).
 - Push to the **FORK** remote (origin is pull-only, 403). Never push while eval runs.
 - After anything is pasted into a submission form, the repo is **FROZEN** — no edits.
+
+### macOS
+- harbor installed via `uv tool install harbor` — available at `~/.local/bin/harbor`.
+- Python is `python3` (system) or managed by `uv`.
+- No path conversion issues.
+
+### Windows (Git Bash)
+- **harbor** at `C:/Users/<username>/.local/bin` — add to PATH per shell.
+- **`export MSYS_NO_PATHCONV=1`** before any `docker run ... /bin/bash` (Git Bash path mangling).
+- Host python may be **`python`** not `python3`; use `python -m uv` if bare `uv` is missing.
+
+### Linux
+- harbor installed via `uv tool install harbor` — ensure `~/.local/bin` is in PATH.
+- May need `sudo usermod -aG docker $USER && newgrp docker` for rootless Docker.
 
 ---
 
@@ -181,13 +207,14 @@ Each reference is a self-contained deep-dive. Read the one matching your current
 | File | Contents | When to load |
 |---|---|---|
 | `references/master-playbook.md` | Strategic thesis, two mechanisms, decision tree, proof stack, per-project ledger, ≤5-commit sequence | Starting a new task; strategic decisions |
-| `references/ci-gate.md` | Pipeline map, three judges, gate arithmetic, verdict reading, infra-vs-merit triage, failure catalog, re-trigger protocol | About to push; red check; reading verdicts |
+| `references/ci-gate.md` | 10-stage pipeline map, Automated Review walkthrough, AVA/QC/Cheat-Pass gates, gate arithmetic, verdict reading, infra-vs-merit triage, failure catalog, re-trigger protocol, revision workflow | About to push; red check; reading verdicts; revision feedback |
+| `references/common-errors.md` | Five rejection reasons, self-check checklist, fairness gut-check, red flags | Before submit; after rejection; self-review |
 | `references/bots.md` | Review bot layers, Model A behavior/loop/strengths/weaknesses, fairness constraints | Designing difficulty; understanding why something solved |
 | `references/measure-first.md` | Proxy-solver harness, task.toml-aware reviewer, the vise + escapes, anti-patterns, ≤5-commit sequence | Before first push; stopping blind iteration |
 | `references/proposal.md` | Pre-paste funnel, paste skeleton, STRENGTHENING triage, failure ledger, ACCEPT journey, checklist | Writing/revising portal proposals |
 | `references/task-build.md` | Phases A–G, four-axis defect sweep, build order, calibration, difficulty strategies, three-pass audit, submission | Building the actual task repo |
 | `references/hard-task-craft.md` | Design principles, v1→v11 case history, certainty system, mistakes ledger, diagnostic loop, reusable playbook | Designing the stump; after a 2/2 solve |
-| `references/verifier-hardening.md` | Threat model, six attack classes, fix patterns, battery procedure, impenetrability checklist | Near submission; deep_review findings; anti-cheat |
+| `references/verifier-hardening.md` | Threat model, six attack classes, fix patterns, battery procedure, impenetrability checklist, AVA pre-emption | Near submission; AVA/deep_review findings; anti-cheat |
 | `references/official-guide.md` | Official rules (file structure, Harbor CLI, schemas, submission checklist, payment) | Rules lookup; format questions |
 
 ---

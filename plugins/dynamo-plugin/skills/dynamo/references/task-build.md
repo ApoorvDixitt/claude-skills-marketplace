@@ -37,7 +37,7 @@ Check each axis and name what would wrongly pass or fail:
 
 | Axis | What breaks Harbor format |
 |---|---|
-| **Format** (`task.toml`) | `artifacts` not a top-level array, or path ≠ what the task writes; missing metadata fields; edited pre-seeded fields (`category`, `subcategory`, `model_tested`, `agent_tested`); forbidden fields (`avg_at_8`, `tags`, `schema_version`); personal info |
+| **Format** (`task.toml`) | `artifacts` not a top-level array, or path ≠ what the task writes; missing metadata fields; edited pre-seeded fields (`category`, `subcategory`, `model_tested`, `agent_tested`); forbidden fields (`tags`, `schema_version` — `avg_at_8` was fully removed); personal info |
 | **Environment** (Dockerfile) | unpinned/floating base (`:latest`, bare tag) — must be an approved base pinned by `@sha256` digest; solution or tests COPYed into the image (leak); unpinned pip; missing `mkdir -p /app`; deps only the oracle needs |
 | **Verifier** (`tests/`) | asserts existence/non-empty instead of real values; reward written anywhere but `/logs/verifier/reward.txt`; no `ctrf.json`; verify-time installs; reads ground truth from an agent-writable path without hardcoding/integrity-check; byte-exact serialization demands; nondeterminism |
 | **Instruction** | vague ("save your findings"); no absolute `/app/...` paths; output file/schema unnamed; requirement enforced by tests but never stated (THE #1 rejection cause); answer leaked (including in an example value!); missing the exact final line `You have N seconds to complete this task. Do not cheat by using online solutions or hints specific to this task.` with N = `[agent].timeout_sec` |
@@ -57,7 +57,9 @@ Check each axis and name what would wrongly pass or fail:
    `/logs/verifier/reward.txt`, ALWAYS `exit 0`.
 4. `instruction.md` → prompt-style, no headers/roleplay; absolute paths; every output
    file + exact format/keys/types disclosed; "what" never "how"; ≤1500 tokens; example
-   values must NOT equal the real answer; ends with the exact timeout line.
+   values must NOT equal the real answer; MUST end with the exact line: "You have N seconds
+   to complete this task. Do not cheat by using online solutions or hints specific to this
+   task." (N = `[agent].timeout_sec`; enforced by `check-instruction-suffix` static check).
 5. `task.toml` → `artifacts` array above first section matching the real outputs;
    best-fit snake_case `task_objective`/`artifact_type`; plain, specific
    `difficulty/solution/verification_explanation` that match the actual verifier.
@@ -66,10 +68,9 @@ Check each axis and name what would wrongly pass or fail:
 ## Phase D — Empirical calibration (never skip, never trust inspection alone)
 
 ```bash
-export PATH="$PATH:/c/Users/Lenovo/.local/bin"       # harbor lives here (uv tool)
-cd <dir-containing-task-folder>
-harbor run -p <task-folder> -a oracle    # MUST -> reward 1.0
-harbor run -p <task-folder> --agent nop  # MUST -> reward 0.0
+# Run from the task/ directory inside your repo
+harbor run -p . --agent oracle    # MUST -> reward 1.0
+harbor run -p . --agent nop       # MUST -> reward 0.0 (reward < 1.0)
 ```
 
 - Results land in `jobs/<timestamp>/<task>__<id>/verifier/{reward.txt,ctrf.json,test-stdout.txt}`.
@@ -90,11 +91,11 @@ harbor run -p <task-folder> --agent nop  # MUST -> reward 0.0
 
 ## Phase E — Difficulty craft (authored tasks only)
 
-**The bar** (verify against the current assignment — it has appeared as both):
-pass@5 ≤ 2/5 valid failures (docs) or avg@8 ≤ 0.5, i.e. ≥4 fails of 8 on
-Opus 4.8 / GPT-5.4 + Terminus-2 (training). Failures count only if the model FINISHED
-and was WRONG on a fair prompt — timeouts, infra errors, and ambiguity are invalid and
-get the task sent back.
+**The bar (pass@5):** The agent must fail at least 3 of 5 attempts. Acceptance band:
+0–2/5 accepted, 3–5/5 rejected. Reference model: GPT-5.4 + Terminus-2 at xhigh reasoning.
+A 0/5 with valid failures is the strongest result (fully stumped). Failures count only if
+the model FINISHED and was WRONG on a fair prompt — timeouts, infra errors, and ambiguity
+are invalid and get the task sent back. The 3600s timeout ceiling applies to all tasks.
 
 **The one idea**: the task must make the model **confidently wrong** — obvious solution
 runs clean, output looks right, model commits. NOT: obscure knowledge, rare languages,
@@ -135,18 +136,19 @@ AND call the failure fair? Both yes → good trap. Also see guide §8 patterns A
 **After anything is pasted into a submission form, the repo is FROZEN. No edits — a
 paste↔repo mismatch is a named rejection cause.**
 
-## Phase G — Submission mechanics & environment quirks
+## Phase G — Submission mechanics
 
-- Push ONLY the task folder (never `jobs/`, SUBMISSION.md, or run logs):
-  `git init && git add . && git commit` inside the task folder itself.
-- Repo visibility: public while being graded, private after passing (per assessment).
-- Scripts as 644 are fine — Harbor invokes via bash (the official tarball ships 644).
-- **Windows host quirks**: Git Bash needs `export MSYS_NO_PATHCONV=1` before any
-  `docker run ... /bin/bash` (path mangling); harbor is at
-  `C:/Users/Lenovo/.local/bin/` (add to PATH per shell); host python is `python`
-  (3.14) not `python3`; use `python -m uv` if bare `uv` is missing from PATH.
-- Answering form fields: give ONLY the paste-ready block; keep explanations outside it
-  and clearly separated so the user never pastes commentary.
+- Push ONLY the task folder (never `jobs/`, SUBMISSION.md, or run logs).
+- Work on the `submission` branch: `git checkout -b submission`.
+- Push to your fork: `git push -u origin submission`.
+- Open PR: `gh pr create --repo handshake-project-dynamo/<your-task-repo> --fill`.
+- Iterate: `git add -A && git commit -m "Address review feedback" && git push`.
+- The checks re-run on every push and update their PR comments in place.
+- Scripts as 644 are fine — Harbor invokes via bash.
+- **After anything is pasted into a submission form, the repo is FROZEN — no edits.**
+- Answering form fields: give ONLY the paste-ready block; keep explanations outside.
+
+Cross-platform: see SKILL.md §8 for Docker/harbor path specifics per OS.
 
 ## Voice & ownership standards (all prose: explanations, README, PR text, answers)
 
