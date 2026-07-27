@@ -3,7 +3,7 @@
 
 **Goal:** clear Check Proposal Quality in **one paste** (or one addressable harden after “clears all gates”), then FREEZE and build. Do not burn cycles on advisory POSSIBLY EASY once the twelve gates PASS.
 
-**Companions:** `dynamo-task` (build after ACCEPT), `hard-task-craft` (stump DNA), `dynamo-ci-gate` (PR). This skill is **proposal-only**.
+**Companion references:** `task-build.md` (build after ACCEPT), `hard-task-craft.md` (stump DNA), `ci-gate.md` (PR). This file is **proposal-only**.
 
 **Canonical ACCEPT examples:**
 - Hardware/GPU: claim `78850ed6` / `dynamo/restore-bank-board` (ACCEPT after STRENGTHENING folds)
@@ -205,7 +205,7 @@ On VERDICT ACCEPT (or “strong + clears gates” with only addressable left):
 1. Save frozen paste in claim `PROPOSAL.md`; mark `PARALLEL_MEMORY.md` **FREEZE / BUILD**.
 2. Fold remaining addressable into **instruction/notes/verifier** during build.
 3. Do **not** open another proposal revise cycle for advisory Criterion 4.
-4. Load `dynamo-task` + `hard-task-craft`; implement stump with garden proof + rival assert before any push.
+4. Read `task-build.md` + `hard-task-craft.md`; implement stump with garden proof + rival assert before any push.
 
 ---
 
@@ -254,7 +254,7 @@ Use this section as the **default thinking process** for the next proposal so AC
 
 ### 8.1 Thinking process (what we did before writing)
 
-1. **Load** `dynamo-proposal` + `hard-task-craft` Mechanism B + `PARALLEL_MEMORY` isolation from live trio.
+1. **Read** this file + `hard-task-craft.md` Mechanism B + `PARALLEL_MEMORY` isolation from live trio.
 2. **Mine corpus** (`dynamo_fail_suggestions_final.csv`) for this subcategory’s 2/2 solves → kill CTF/CRC/single-int; keep AuthZ path-canon DNA that already 0/5’d elsewhere.
 3. **Five-step idea funnel** (user ritual): draft → vs our past proposals → vs ACCEPTed bank-board/admit-board DNA → web/real-domain check (OPA path bypass, BloodHound reachability, RFC 3986) → hard-gate stress (CoG, uniqueness, garden, named-gotcha) → only then write paste.
 4. **Pick stump shape before prose:** loud ms; silent prefix+flat on toe; house = decode→slash-collapse→dot + segment match + transitive closure + post-canon blast; ≥2 visible compounds.

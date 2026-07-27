@@ -3,9 +3,9 @@
 
 Everything about getting a Dynamo PR to green: the pipeline, the three judges, the exact
 gate math, verdict-reading, infra-vs-merit triage, the failure catalog from every commit of
-two projects, and the playbook that clears it in one or two pushes. Companions:
-`hard-task-craft` (design a stumping task), `verifier-hardening` (make the verifier
-impenetrable), `dynamo-bots` (the agents' behavior), `dynamo-task` (build procedure). This
+two projects, and the playbook that clears it in one or two pushes. Companion references:
+`hard-task-craft.md` (design a stumping task), `verifier-hardening.md` (make the verifier
+impenetrable), `bots.md` (the agents' behavior), `task-build.md` (build procedure). This
 file is the one to open when you are **at the gate**, not designing.
 
 ---
@@ -294,7 +294,8 @@ Classified so you can triage instantly: **INFRA** (not your fault — re-trigger
 | static fail: `artifacts` nested / wrong path / not top-level | PACKAGING | task.toml shape | Top-level `artifacts = [...]` of the real output paths |
 | static fail: solution-file name appears in a test docstring | PACKAGING | Static greps docstrings for undocumented-output tokens | Never name solution files anywhere agent-visible or in tests |
 | static fail: `allow_internet is true` / `environment.allow_internet=false; this benchmark requires internet access` | PACKAGING | This Dynamo/TB2 track **requires** `allow_internet = true` | Set `allow_internet = true` in `task.toml` — never "optimize" to false |
-| rubric fail: shipped the platform "You have N seconds..." timeout line | PACKAGING | This repo's rubric FORBIDS it (repo rubric outranks platform docs) | Remove the line; repo rubric wins on any conflict |
+| static fail: `check-instruction-suffix` — missing the "You have N seconds..." line | PACKAGING | The CURRENT platform REQUIRES the suffix line; N must equal `[agent].timeout_sec` | Add the exact line; keep N in sync with `task.toml` |
+| rubric fail on one historical repo: shipped the "You have N seconds..." line | PACKAGING | That single repo's `.dynamo/dynamo-rubric.toml` overrode the platform default | Historical only. Check YOUR repo's `.dynamo/dynamo-rubric.toml` before removing anything — the default is to INCLUDE the line |
 
 ---
 
@@ -332,19 +333,19 @@ The whole point: front-load everything the gate checks so the first push is alre
 1. Design for a valid failure with 4A or 4B from the start — not "make it hard," but "make a
    completed agent search end wrong." If a senior engineer could name your trap from the
    proposal, the model names it too; the trap must live in reconstructable arithmetic.
-2. Build in `dynamo-task` order (solve.sh -> Dockerfile -> tests -> instruction -> task.toml
+2. Build in `task-build.md` Phase C order (solve.sh -> Dockerfile -> tests -> instruction -> task.toml
    -> README).
 3. **Prove uniqueness:** the intended answer is the ONLY one reproducing the visible evidence
    (full cross-product probe). If two combinations match, the task is ambiguous (invalid-fail
    trap) — add a discriminator and re-probe.
 4. **Calibrate:** harbor oracle -> 1.0, nop -> 0.0, twice, repeatable.
-5. **Run the impenetrability battery** (`verifier-hardening/battery.py`): every anti-cheat
-   probe scores 0, oracle 1.0, leak scan clean. This pre-empts the deep_review lottery — the
-   single biggest source of wasted commits.
+5. **Run the impenetrability battery** (the procedure in `references/verifier-hardening.md`
+   §1–§3): every anti-cheat probe scores 0, oracle 1.0, leak scan clean. This pre-empts both
+   the Automated Review lottery and the AVA gate — the single biggest source of wasted commits.
 6. **Full-repo audit** (`git ls-files`, not just `task/`): no file, PR title, or README from a
    previous iteration; stale-term grep clean; LF endings; task.toml parses; instruction<->
    tests 1:1; no answer or solution-filename token anywhere agent-visible; no personal info;
-   no forbidden timeout line.
+   instruction ends with the required "You have N seconds..." line, N == `[agent].timeout_sec`.
 7. Confirm the built image is clean (leak scan) and `/app` is seed-only.
 
 **Push, then watch — do not touch anything while it runs.** Expect the order in section 0;
@@ -380,8 +381,10 @@ commit.
    GitHub/Daytona/Claude outages; re-trigger identical, never redesign, never push mid-run.
 8. **Prove, never guess.** Uniqueness cross-product + oracle/nop + wrong-solution proof +
    anti-cheat battery on the EXACT shipped state converts "I think it's right" into "I know."
-9. **Repo rubric outranks platform docs** on any conflict (the forbidden timeout line is the
-   canonical example).
+9. **Read YOUR repo's `.dynamo/dynamo-rubric.toml` — it is the exact checklist you are graded
+   on.** Where it explicitly overrides a platform default, it wins; otherwise the platform docs
+   stand. (One historical repo overrode the timeout-suffix rule — that was repo-specific, not a
+   general licence to drop platform requirements.)
 10. **Persistence is the method.** cost-basis took eleven versions (ten straight 2/2 solves)
     to reach 0/2; restore-archive took a long chain of infra deaths and lottery findings to
     reach 0/5. Both ACCEPTED. Read every verdict, fix one diagnosed thing, re-prove, push
@@ -390,12 +393,14 @@ commit.
 
 ---
 
-## 8. The revision workflow
+## 9. The revision workflow
 
-- **Revisions outrank new work.** Fix sent-back tasks before claiming new ones.
-- **Maximum 2 revisions allowed.** After two rounds → Holding-Rejection.
+- **Revisions outrank new work.** Fix sent-back tasks before claiming new ones — a task that
+  already cleared part of review is much closer to the bonus than a fresh claim.
+- **Maximum 2 revisions allowed.** After two rounds without approval → Holding-Rejection: stop
+  working on it and start a new task.
 - **Read the feedback first.** Most common: undisclosed verifier rules, contradictions, ambiguity.
-- **Re-run oracle + nop after every revision.**
-- **Push to the same branch** — don’t open a new PR.
+- **Re-run oracle + nop after every revision** — don't resubmit until calibration passes again.
+- **Push to the same branch** — don't open a new PR. Check comments update in place on re-run.
 
 Pipeline: Sent back → Revision 1 → Re-review → Revision 2 → Re-review → Holding-Rejection.

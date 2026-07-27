@@ -14,8 +14,10 @@ A task also faces an advisory **Adversarial Cheat-Pass** (red-teams whether test
 without solving). Both target the same weaknesses this battery catches.
 
 
-Companion runnable: `battery.py` in this folder automates the task-agnostic probes. This
-file is the brain; run the script, then apply the fixes below to anything it flags.
+**How to use this file:** the "battery" is a procedure you run by hand (or script yourself
+per-task), not a tool that ships with this skill. §1 lists the attack classes and §2 the fix
+patterns; §3 is the runbook. Work §1 top to bottom against your actual task, then apply the
+matching §2 pattern to anything that scores the oracle reward.
 
 ---
 
@@ -100,7 +102,7 @@ Rules that make it hold:
 - **Absence beats obscurity.** Renaming/moving golden files does not stop a same-user
   absolute-path scan. Only removing every on-disk copy before untrusted code runs does.
 - **Keep the comparison readable.** Compare against in-memory arrays/values with a plain
-  equality/近-tolerance assert. Do NOT switch to hashing the output as the check — the
+  equality/near-tolerance assert. Do NOT switch to hashing the output as the check — the
   rubric's `readable_tests` counts "opaque hashes standing in for checks" as a negative.
   (A hash may *disambiguate* inside the task, as long as the pass/fail assert is legible.)
 - **Bound every subprocess.** `check=True` + `timeout=N` with `N × n_files` comfortably
@@ -134,22 +136,26 @@ Rules that make it hold:
 
 ## 3. How to run it
 
-```bash
-# from the directory that contains the task folder (the one with task.toml inside <task>/)
-export PATH="$PATH:/c/Users/Lenovo/.local/bin"     # wherever harbor lives
-export MSYS_NO_PATHCONV=1                            # Git Bash + docker
-python .claude/skills/verifier-hardening/battery.py <task-folder>
-```
+Run from the `task/` directory. Confirm `docker info` succeeds first — a down daemon makes
+harbor produce no jobs, which looks like a pass. On Windows Git Bash, `export
+MSYS_NO_PATHCONV=1` before any `docker run ... /bin/bash`.
 
-The script:
-1. Calibrates oracle=1.0 / nop=0.0 (fails loudly otherwise).
-2. Runs the task-agnostic probes it can synthesize with no task knowledge: reward-hijack,
-   empty-artifact, determinism, and the leak scan.
-3. Detects whether the verifier executes an agent artifact (scans `tests/` for a
-   `subprocess`/`Popen` invoking an `/app/...` path) and whether golden files live in
-   `tests/`; if so it prints the exact A–D/F planted-artifact probes to drop in, since those
-   need the task's I/O contract.
-4. Prints a scorecard; every line must read PASS before submission.
+The procedure, in order:
+
+1. **Calibrate.** `harbor run -p . --agent oracle` → 1.0 and `harbor run -p . --agent nop`
+   → 0.0. If either is wrong, stop — nothing below is meaningful until calibration holds.
+2. **Run the task-agnostic probes** (these need no knowledge of your task's I/O contract):
+   reward-hijack (E), empty-artifact (G), determinism (H), and the leak scan (L).
+3. **Decide whether the planted-artifact probes apply.** They do if your verifier executes an
+   agent-authored program — grep `tests/` for a `subprocess`/`Popen` invoking an `/app/...`
+   path — or if golden files live under `tests/`. If either is true, hand-write the A–D and F
+   probes against your task's actual I/O contract and run each as the delivered artifact.
+4. **Score it.** Copy each probe's reward into a scorecard; every line must read PASS
+   (reward 0 for exploits, 1.0 for the oracle) before submission.
+
+To automate this for a specific task, script steps 1–3 yourself: copy the task to a temp dir,
+swap each exploit in as the delivered artifact, run the real harbor verifier, assert reward 0.
+Keep that script outside the task repo — it is never committed.
 
 Interpreting results: any probe scoring the oracle reward (usually `1.0`) is a live hole —
 fix with the matching §2 pattern and re-run. The battery is only meaningful on the exact

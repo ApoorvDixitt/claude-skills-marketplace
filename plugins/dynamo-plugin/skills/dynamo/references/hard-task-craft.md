@@ -234,7 +234,8 @@ disagree → a bug; fix before CI sees it.
    nothing writes the output.)
 6. **Hygiene gates** — leak-scan the *built* image (only seed files in `/app`); all
    files LF; `task.toml` parses and every field rule holds; instruction↔tests 1:1;
-   no answer string agent-visible; no personal info; no forbidden timeout-suffix line.
+   no answer string agent-visible; no personal info; instruction ends with the required
+   "You have N seconds..." line, N == `[agent].timeout_sec`.
 
 All six green on the exact shipped state → you are not guessing. You know.
 
@@ -302,7 +303,7 @@ Build/repair in this order (each step's detail lives in the sections above):
    `/logs/verifier/reward.txt`, always `exit 0`.
 4. **`instruction.md`** → prompt-style, absolute paths, every output file + exact
    keys/types disclosed, "what" not "how", example values ≠ the real answer, no trap
-   name, **no** timeout-suffix line (this repo).
+   name, ends with the required "You have N seconds..." line (N == `[agent].timeout_sec`).
 5. **`task.toml`** → `artifacts` a top-level array of the real outputs; pre-seeded
    fields (`category`, `subcategory`, `model_tested`, `agent_tested`) untouched;
    plain explanations that match the actual verifier.
@@ -335,7 +336,8 @@ For any build or self-review, check each axis and name what would wrongly pass/f
 4. Verifier must not enforce anything the instruction doesn't state.
 5. `artifacts` = top-level array of the real output paths.
 6. Pre-seeded `task.toml` fields untouched; no personal info anywhere.
-7. Instruction ends without the forbidden timeout line (this repo's rubric).
+7. Instruction ends with the required "You have N seconds..." line, N == `[agent].timeout_sec`
+   (unless your repo's `.dynamo/dynamo-rubric.toml` explicitly overrides).
 8. **Oracle 1.0 and nop 0.0, repeatable, before any submission — no exceptions.**
 9. A failure counts only if the model **FINISHED and was WRONG on a fair prompt.**
 10. Uniqueness is non-negotiable: the artifact must pin exactly one answer (probe it).

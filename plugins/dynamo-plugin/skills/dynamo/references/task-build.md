@@ -6,8 +6,8 @@ authoring for Handshake AI). The stakes: reviews are effectively one-shot, tasks
 graded by automated LLM checks AND human reviewers, and the user's pay depends on
 first-pass acceptance. Precision beats speed everywhere.
 
-**Deep reference (read it when detail is needed):** `PROJECT-DYNAMO-GUIDE.md` at the
-project root. This skill is the operating procedure; the guide is the rulebook.
+**Deep reference (read it when detail is needed):** `references/official-guide.md` — the
+verbatim platform rulebook. This file is the operating procedure; that one is the rules.
 **Session memory:** check the memory directory for `dynamo-*` and `project-dynamo-*`
 files — they carry the current status of in-flight tasks and past decisions.
 
@@ -20,16 +20,16 @@ files — they carry the current status of in-flight tasks and past decisions.
    environment/Dockerfile + data, solution/, tests/, README, .dynamo/ if present).
 2. Classify the situation and branch:
    - **Quiz / training assessment** → answer strictly from the assessment's own panels;
-     explain why each wrong option is wrong. Where materials conflict on numbers
-     (pass@5 vs avg@8), the CURRENT assessment's own text wins.
+     explain why each wrong option is wrong. Where materials conflict on numbers, the
+     CURRENT assessment's own text wins (the live bar is pass@5: ≥3 fails of 5).
    - **Broken-task repair** → run the four-axis defect sweep (Phase B), fix, calibrate,
      audit, submit.
-   - **New task authoring** → proposal gate FIRST (write no code until it passes). Load
-     **`dynamo-proposal`** skill and follow its one-shot portal checklist before any paste;
+   - **New task authoring** → proposal gate FIRST (write no code until it passes). Read
+     `references/proposal.md` and follow its one-shot portal checklist before any paste;
      then design the stump (Phase E), then build in Phase C order.
    - **Revision after review feedback** → address every reviewer point explicitly before
      anything else; revisions outrank new work.
-3. Check the environment (Windows host quirks matter — see Phase G).
+3. Check the environment (see Phase G and `SKILL.md` §8 for per-OS specifics).
 
 ## Phase B — The four-axis defect sweep (for repairs and self-review)
 

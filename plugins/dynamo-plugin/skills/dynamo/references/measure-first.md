@@ -121,7 +121,7 @@ The winning crux threaded the vise with a **third fairness mechanism**, distinct
 
 ### D. Process anti-patterns — the specific wrong steps
 1. **Pushing on `oracle=1.0` alone.** oracle=1.0 measures *nothing* about difficulty or fairness. Every push not preceded by a proxy trip-rate + a two-reviewer fairness read was a coin toss.
-2. **Trusting a pasted human doc over live CI.** (See Hard-won cautions — the "You have N seconds…" TB3 line the guide demands is an auto-FAIL for TB2 `review`.) It broke a previously-green static check. **When a doc contradicts an empirical CI result, trust the CI.**
+2. **Trusting a stale doc over live CI.** On one historical repo, adding the "You have N seconds…" line broke a previously-green static check because that repo's rubric overrode the platform default. **When a doc contradicts an empirical CI result on YOUR repo, trust the CI — and read `.dynamo/dynamo-rubric.toml` to learn which rule actually applies.** (Current platform default: the line is REQUIRED.)
 3. **Not reading the failure reason before "fixing."** Multiple "failures" were pure Daytona `DaytonaAuthorizationError` (agent never launched, verifier never ran) — zero task signal. Treating infra noise as a design defect wastes commits and can trigger a *wrong* redesign. **Grep the job log for the actual verdict/breakdown first; `infra != merit`.**
 4. **No reserve, because no measurement.** With a proxy harness, ~24 of elim-board's 25 commits collapse to ~3 (calibrate → measure-iterate-locally → push-once), leaving a genuine reserve commit for a verdict-driven surgical fix.
 

@@ -8,8 +8,8 @@
 The cross-project synthesis. Four tasks in, the commit count fell from ~20 to under 5.
 This file is why, and how to repeat it. Read it first on any new Dynamo task, pick the
 mechanism BEFORE building, then follow the build+prove sequence. Deep detail lives in the
-five skills (`hard-task-craft`, `dynamo-ci-gate`, `dynamo-bots`, `verifier-hardening`,
-`dynamo-task`); this is the top-level map that keeps you from re-exploring dead ends.
+sibling references (`hard-task-craft.md`, `ci-gate.md`, `bots.md`, `verifier-hardening.md`,
+`task-build.md`); this is the top-level map that keeps you from re-exploring dead ends.
 
 ---
 
@@ -224,8 +224,8 @@ Front-load everything the gate checks so push #1 is already green. Build order:
    from disk before any agent code runs; isolated single-input dir per run; bounded subprocess;
    reward written LAST from pytest exit; always `exit 0`.
 4. `instruction.md` → prompt-style; absolute paths; every output file + schema; "what" not
-   "how"; example values ≠ the answer; no trap name; no timeout-suffix line (this repo forbids
-   it — repo rubric outranks platform docs).
+   "how"; example values ≠ the answer; no trap name; ends with the required "You have N
+   seconds..." line (N == `[agent].timeout_sec`, enforced by `check-instruction-suffix`).
 5. `task.toml` → `artifacts` a top-level array of real outputs; pre-seeded
    category/subcategory/model/agent UNTOUCHED; `task_objective`/`artifact_type` best-fit;
    explanations that describe the verifier you actually shipped (the bot cross-reads them; put

@@ -55,6 +55,8 @@ Both yes = legitimate stump. Either no = cut or fix.
 
 ## Full worked examples
 
-See `official-guide.md` §"Common errors and examples" for four complete case studies with
-code excerpts: coherent instructions, correct reference solution, sound verifier, protected
-ground truth, and runnable/realistic benchmark task.
+See `official-guide.md` §"Common errors and examples" for the worked case studies with code
+excerpts. Its subsections, in order: "Common pitfalls, grouped by requirement area",
+"Flags & Fixes", "Pass AVA", "Before you submit", "Audit the requirements", "Don't expose the
+answer", "Your docs must be true of the data", and "The rules were wrong, and the checker was
+blind".

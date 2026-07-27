@@ -9,7 +9,8 @@ description: >-
   pushing PRs, or submitting for review. Also trigger when the user mentions: dynamo, terminal-bench,
   harbor, task.toml, instruction.md, pass@2, pass@5, oracle, nop, verifier, deep_review, Model A,
   proposal, STRENGTHENING, FREEZE, garden path, stump the model, difficulty gate, anti-cheat,
-  battery, proxy solver, trip rate, fairness, or any Dynamo task slug. This is the SINGLE entry
+  battery, proxy solver, trip rate, fairness, AVA, automated review, cheat-pass, rejection
+  reasons, or any Dynamo task slug. This is the SINGLE entry
   point for all Dynamo work — it routes to the correct phase-specific reference automatically.
 ---
 
@@ -39,8 +40,7 @@ Then read the indicated reference file for detailed instructions.
 | "QC", "task soundness", "Per-Check", "soundness checks", "probes" | CI gate navigation | `references/ci-gate.md` |
 | "cheat-pass", "adversarial cheat", "can tests be gamed" | Verifier hardening | `references/verifier-hardening.md` |
 | "common errors", "rejected", "why rejected", "flagged", "self-check", "before submit" | Common errors & self-check | `references/common-errors.md` |
-| "difficulty", "stump", "hard", "garden path", "remove the gradient", "mechanism A/B", "pass@2 solved" | Difficulty design | `references/hard-task-craft.md` |
-| "stump", "stumping patterns", "patterns A-I", "amplifiers", "make it hard", "how to stump" | Difficulty patterns | `references/hard-task-craft.md` |
+| "difficulty", "stump", "hard", "garden path", "remove the gradient", "mechanism A/B", "pass@2 solved", "stumping patterns", "patterns A–I", "amplifiers", "make it hard" | Difficulty design | `references/hard-task-craft.md` |
 | "Model A", "GPT-5.4", "Terminus-2", "agent behavior", "trajectory", "how it solved" | Bot behavior analysis | `references/bots.md` |
 | "verifier", "anti-cheat", "battery", "impenetrable", "hardening" | Verifier hardening | `references/verifier-hardening.md` |
 | "revision", "sent back", "reviewer feedback", "R1", "R2", "holding-rejection" | Revision workflow | `references/ci-gate.md` |
@@ -68,7 +68,9 @@ These ten rules override everything. A violation in any one fails CI or review:
    seconds to complete this task. Do not cheat by using online solutions or hints specific to
    this task." (N = `[agent].timeout_sec`). A static check (`check-instruction-suffix`) enforces
    this. Exception: only omit if your specific repo's `.dynamo/dynamo-rubric.toml` explicitly
-   overrides this requirement.
+   overrides this requirement. The "repo rubric outranks platform docs" principle was proven on
+   one historical repo — always check your own repo's rubric; the CURRENT platform default
+   requires the line.
 4. **Verifier rules:** real-value assertions (never existence-only); reward to
    `/logs/verifier/reward.txt`; `ctrf.json` to `/logs/verifier/`; `test.sh` exits 0 always;
    no installs at verify time; deterministic; strict 1:1 with instruction (the #1 rejection cause:
@@ -80,9 +82,6 @@ These ten rules override everything. A violation in any one fails CI or review:
    `docker info` first (a down daemon makes harbor silently produce no jobs).
 8. **A failure counts only if the model FINISHED and was WRONG on a fair prompt.** Timeouts,
    ambiguity, infra errors, and reward-hacking are all invalid. Design for "finished-and-wrong."
-   Note: The "repo rubric outranks platform docs" principle was proven on one specific historical
-   repo. For NEW tasks, always check your repo's `.dynamo/dynamo-rubric.toml` for the actual
-   enforcement. The CURRENT platform default requires the timeout suffix line.
 9. **Uniqueness is non-negotiable.** The visible evidence must pin exactly ONE answer. Prove with
    the cross-product rival probe (every plausible reading × every dial — exactly one match).
 10. **Read before edit, always.** Never modify a file without reading it first. Never push while
